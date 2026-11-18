@@ -811,6 +811,31 @@ function ownershipParts(c) {
 function yearlyOwnership(c) {
   return ownershipParts(c).total;
 }
+function aboutMoney(n) {
+  const abs = Math.abs(Math.round(n));
+  const step = abs >= 1000 ? 100 : 10;
+  return Math.round(abs / step) * step;
+}
+function tradeoffLine(c, compared) {
+  const rec = ownershipParts(c);
+  const base = ownershipParts(consideredCar());
+  const name = compared || 'the car you were considering';
+  const delta = rec.total - base.total;
+  const amount = aboutMoney(delta);
+  if (amount < 200) return 'Stronger car, and the yearly cost is close to a new ' + name + '.';
+  const gaps = [
+    ['the loan', rec.payment - base.payment],
+    ['insurance', rec.insurance - base.insurance],
+    ['service', rec.maint - base.maint],
+    ['fuel', rec.fuel - base.fuel]
+  ].filter((g) => delta > 0 ? g[1] > 80 : g[1] < -80)
+    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+    .slice(0, 2)
+    .map((g) => g[0]);
+  const mostly = gaps.length ? ', mostly ' + gaps.join(' and ') : '';
+  if (delta > 0) return 'Stronger car, about $' + amount.toLocaleString() + ' more a year' + mostly + '.';
+  return 'Stronger car, about $' + amount.toLocaleString() + ' less a year than a new ' + name + '.';
+}
 
 function consideredCar() {
   const text = (window._considering || '').toLowerCase();
@@ -905,15 +930,9 @@ function renderDeck(fromFilter) {
     const isTop = i === 0 && offset === 0;
     const upgradeBadge = c.luxury ? 'Premium upgrade' : (c.price >= budget * 0.85 ? 'Best match' : 'Value');
     const left = Math.max(0, budget - c.price);
-    const pay = Math.round(c.price * 0.018);
+    const pay = Math.round(c.price * 0.018 / 10) * 10;
     const own = yearlyOwnership(c);
-    const baseOwn = baselineOwnership();
-    const delta = baseOwn - own;
-    const vs = delta > 200
-      ? `About $${delta.toLocaleString()} less a year to own than a new ${compared}.`
-      : delta < -200
-        ? `About $${Math.abs(delta).toLocaleString()} more a year to own, for a stronger car than a new ${compared}.`
-        : `Yearly cost is close to a new ${compared}, with more car for the price.`;
+    const line = tradeoffLine(c, compared);
     const chips = matchLabels(c).map(m => `<span>${m}</span>`).join('');
     return `
     <div class="rec-card" style="${isTop ? 'border:2px solid var(--accent);grid-column:span 1' : ''}">
@@ -926,13 +945,12 @@ function renderDeck(fromFilter) {
         </div>
         <div style="color:var(--muted);font-size:0.85rem;margin-bottom:0.3rem">${c.trim}</div>
         <div class="price">$${c.price.toLocaleString()}</div>
+        <div style="font-size:0.95rem;font-weight:650;color:#1370d0;margin-top:0.15rem">about $${pay.toLocaleString()} a month</div>
         <div style="font-size:0.8rem;color:var(--muted);margin:0.2rem 0">${c.mileage.toLocaleString()} mi</div>
         <div class="insight">
-          <div class="deal-kicker">Why this instead</div>
-          <div>$${left.toLocaleString()} left in your $${budget.toLocaleString()} budget.</div>
-          <p class="deal-sub">${vs}</p>
+          <p class="deal-sub" style="margin:0;color:var(--text);font-size:0.88rem">${line}</p>
           <div class="deal-metrics">
-            <div><b>$${pay.toLocaleString()}</b><span>per month</span></div>
+            <div><b>$${left.toLocaleString()}</b><span>left in budget</span></div>
             <div><b>$${estMaintenance(c).toLocaleString()}</b><span>upkeep / yr</span></div>
             <div><b>$${own.toLocaleString()}</b><span>to own / yr</span></div>
           </div>
