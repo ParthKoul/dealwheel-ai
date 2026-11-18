@@ -37,6 +37,20 @@ async function autodevPhoto(make, model, year) {
   return null;
 }
 
+function safeImageUrl(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return null;
+    if (parsed.username || parsed.password) return null;
+    const host = parsed.hostname.toLowerCase();
+    if (host === 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) return null;
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(':')) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
 export default async function handler(req, res) {
   const { make, model, year } = req.query;
   const imageKey = process.env.CAR_IMAGES_API_KEY;
@@ -53,8 +67,8 @@ export default async function handler(req, res) {
     try {
       const supabase = createClient(supabaseUrl, supabaseKey);
       const { data } = await supabase.from('car_images').select('image_url').eq('cache_key', cacheKey).single();
-      if (data?.image_url && /^https?:/i.test(data.image_url) && !data.image_url.includes('imagin.studio')) {
-        return res.redirect(302, data.image_url);
+      if (data?.image_url && safeImageUrl(data.image_url) && !data.image_url.includes('imagin.studio')) {
+        return res.redirect(302, safeImageUrl(data.image_url));
       }
     } catch (e) {}
   }
@@ -66,9 +80,23 @@ export default async function handler(req, res) {
     photo = `https://carimagesapi.com/image?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year || ''}&view=front34&width=800&key=${imageKey}`;
   }
 
+  photo = safeImageUrl(photo);
   if (!photo) return res.status(404).json({ url: null });
 
-  if (supabaseUrl && supabaseKey && !photo.includes('carimagesapi.com')) {
+  if (photo.includes('carimagesapi.com')) {
+    try {
+      const img = await fetch(photo);
+      if (!img.ok) return res.status(404).json({ url: null });
+      const bytes = Buffer.from(await img.arrayBuffer());
+      res.setHeader('Content-Type', img.headers.get('content-type') || 'image/jpeg');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.status(200).send(bytes);
+    } catch {
+      return res.status(404).json({ url: null });
+    }
+  }
+
+  if (supabaseUrl && supabaseKey) {
     try {
       const supabase = createClient(supabaseUrl, supabaseKey);
       await supabase.from('car_images').upsert({

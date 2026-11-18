@@ -958,18 +958,18 @@ function renderDeck(fromFilter) {
     return `
     <div class="rec-card" style="${isTop ? 'border:2px solid var(--accent);grid-column:span 1' : ''}">
       ${isTop ? '<div style="background:var(--accent);color:#fff;font-size:0.7rem;padding:0.25rem 0.5rem;text-align:center">Top upgrade for you</div>' : ''}
-      <img loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" src="${verifyImage(c.make, c.model, c.image, c.year)}" onerror="this.onerror=null;this.src=getFallback('${c.make}','${c.model}')" data-make="${c.make}" data-model="${c.model}" data-year="${c.year}" alt="${c.year} ${c.make} ${c.model}">
+      <img loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" src="${safeImg(verifyImage(c.make, c.model, c.image, c.year))}" onerror="this.onerror=null;this.src=getFallback(${jsArg(c.make)},${jsArg(c.model)})" data-make="${esc(c.make)}" data-model="${esc(c.model)}" data-year="${esc(c.year)}" alt="${esc(c.year)} ${esc(c.make)} ${esc(c.model)}">
       <div class="c">
         <div style="display:flex;justify-content:space-between;align-items:start">
-          <h3>${c.year} ${c.make} ${c.model}</h3>
-          <span class="badge" style="background:${c.luxury ? '#e7f6ee' : ''};color:${c.luxury ? 'var(--success)' : ''}">${upgradeBadge}</span>
+          <h3>${esc(c.year)} ${esc(c.make)} ${esc(c.model)}</h3>
+          <span class="badge" style="background:${c.luxury ? '#e7f6ee' : ''};color:${c.luxury ? 'var(--success)' : ''}">${esc(upgradeBadge)}</span>
         </div>
-        <div style="color:var(--muted);font-size:0.85rem;margin-bottom:0.3rem">${c.trim}</div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-bottom:0.3rem">${esc(c.trim)}</div>
         <div class="price">$${c.price.toLocaleString()}</div>
         <div style="font-size:0.95rem;font-weight:650;color:#1370d0;margin-top:0.15rem">about $${pay.toLocaleString()} a month</div>
         <div style="font-size:0.8rem;color:var(--muted);margin:0.2rem 0">${c.mileage.toLocaleString()} mi</div>
         <div class="insight">
-          <p class="deal-sub" style="margin:0;color:var(--text);font-size:0.88rem">${line}</p>
+          <p class="deal-sub" style="margin:0;color:var(--text);font-size:0.88rem">${esc(line)}</p>
           <div class="deal-metrics">
             <div><b>$${left.toLocaleString()}</b><span>left in budget</span></div>
             <div><b>$${estMaintenance(c).toLocaleString()}</b><span>upkeep / yr</span></div>
@@ -1555,18 +1555,18 @@ async function showDetail(id) { window._currentId = id;
   }
   const stockNote = live.length
     ? (farther
-      ? `<div class="insight" style="margin-bottom:0.8rem">No available listings in your area. Showing similar ${c.make} ${c.model} cars farther away.</div>`
-      : `<div class="insight" style="margin-bottom:0.8rem">${live.length} listing${live.length === 1 ? '' : 's'} near ${zip}.</div>`)
-    : `<div class="insight" style="margin-bottom:0.8rem">No available listings near ${zip}. This is the car detail only — we are not linking to a page we could not confirm.</div>`;
+      ? `<div class="insight" style="margin-bottom:0.8rem">No available listings in your area. Showing similar ${esc(c.make)} ${esc(c.model)} cars farther away.</div>`
+      : `<div class="insight" style="margin-bottom:0.8rem">${live.length} listing${live.length === 1 ? '' : 's'} near ${esc(zip)}.</div>`)
+    : `<div class="insight" style="margin-bottom:0.8rem">No available listings near ${esc(zip)}. This is the car detail only — we are not linking to a page we could not confirm.</div>`;
   const listingCards = live.slice(0, 6).map(l => `
     <div class="rec-card">
-      <img loading="lazy" decoding="async" src="${l.image || c.image}" alt="${c.year} ${c.make} ${c.model}" onerror="this.onerror=null;this.src=getFallback('${c.make}','${c.model}')">
+      <img loading="lazy" decoding="async" src="${safeImg(l.image || c.image)}" alt="${esc(c.year)} ${esc(c.make)} ${esc(c.model)}" onerror="this.onerror=null;this.src=getFallback(${jsArg(c.make)},${jsArg(c.model)})">
       <div class="c">
-        <h3>${c.year} ${c.make} ${c.model}</h3>
+        <h3>${esc(c.year)} ${esc(c.make)} ${esc(c.model)}</h3>
         <div class="price">$${Number(l.price || 0).toLocaleString()}</div>
-        <div style="font-size:0.8rem;color:var(--muted)">${Number(l.mileage || 0).toLocaleString()} mi • ${l.location || ''}</div>
+        <div style="font-size:0.8rem;color:var(--muted)">${Number(l.mileage || 0).toLocaleString()} mi • ${esc(l.location || '')}</div>
         <div class="card-actions">
-          ${l.vdp ? `<button class="btn" onclick="gateDealer(${c.id}, decodeURIComponent('${encodeURIComponent(l.vdp)}'))">View at Dealer</button>` : ''}
+          ${l.vdp ? `<button class="btn" type="button" data-vdp="${esc(l.vdp)}" onclick="gateDealer(0, this.dataset.vdp)">View at Dealer</button>` : ''}
         </div>
       </div>
     </div>`).join('');
@@ -1588,11 +1588,11 @@ async function showDetail(id) { window._currentId = id;
   document.getElementById('detail').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:1.2rem">
       <div>
-        <img loading="eager" decoding="async" src="${verifyImage(c.make, c.model, c.image, c.year)}" onerror="this.onerror=null;this.src=getFallback('${c.make}','${c.model}')" data-make="${c.make}" data-model="${c.model}" data-year="${c.year}" style="width:100%;border-radius:8px;height:220px;object-fit:cover" alt="${c.year} ${c.make} ${c.model}">
-        <h2 style="margin:0.6rem 0 0.2rem">${c.year} ${c.make} ${c.model}</h2>
-        <div style="color:var(--muted)">${c.trim || ''}</div>
+        <img loading="eager" decoding="async" src="${safeImg(verifyImage(c.make, c.model, c.image, c.year))}" onerror="this.onerror=null;this.src=getFallback(${jsArg(c.make)},${jsArg(c.model)})" data-make="${esc(c.make)}" data-model="${esc(c.model)}" data-year="${esc(c.year)}" style="width:100%;border-radius:8px;height:220px;object-fit:cover" alt="${esc(c.year)} ${esc(c.make)} ${esc(c.model)}">
+        <h2 style="margin:0.6rem 0 0.2rem">${esc(c.year)} ${esc(c.make)} ${esc(c.model)}</h2>
+        <div style="color:var(--muted)">${esc(c.trim || '')}</div>
         <div class="price" style="font-size:1.6rem;margin:0.5rem 0">$${Number(c.price || 0).toLocaleString()}</div>
-        <div style="font-size:0.85rem;color:var(--muted)">${Number(c.mileage || 0).toLocaleString()} miles • ${c.location || ''}</div>
+        <div style="font-size:0.85rem;color:var(--muted)">${Number(c.mileage || 0).toLocaleString()} miles • ${esc(c.location || '')}</div>
       </div>
       <div>
         <h3 style="margin-top:0">Out-the-door price</h3>
@@ -1704,8 +1704,23 @@ function revealListings() {
   if (lock) lock.remove();
   window._formForListings = false;
 }
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&', '<': '<', '>': '>', '"': '"', "'": '&#39;' }[ch]));
+}
+function safeImg(url) {
+  const s = String(url || '');
+  if (s.startsWith('/api/car-image')) return esc(s);
+  if (/^https:\/\//i.test(s)) return esc(s);
+  return '';
+}
+function jsArg(s) {
+  return esc(JSON.stringify(String(s ?? '')));
+}
 function gateDealer(id, vdp) {
-  if (vdp) window.open(vdp, '_blank', 'noopener');
+  let url;
+  try { url = new URL(vdp); } catch { return; }
+  if (url.protocol !== 'https:' || url.username || url.password) return;
+  window.open(url.href, '_blank', 'noopener,noreferrer');
 }
 
 function quickInquiry(id) {

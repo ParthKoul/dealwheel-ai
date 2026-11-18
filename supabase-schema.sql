@@ -1,4 +1,6 @@
--- Run this in the Supabase SQL editor
+-- Run this in the Supabase SQL editor.
+-- The API uses the service role key, which bypasses these rules.
+-- Do not add a public read policy. That would expose every lead.
 
 create table if not exists leads (
   id bigint generated always as identity primary key,
@@ -18,8 +20,5 @@ create table if not exists leads (
 
 alter table leads enable row level security;
 
-create policy "Allow inserts" on leads
-  for insert with check (true);
-
-create policy "Allow reads for authenticated" on leads
-  for select using (true);
+drop policy if exists "Allow inserts" on leads;
+drop policy if exists "Allow reads for authenticated" on leads;

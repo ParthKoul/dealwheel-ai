@@ -1,4 +1,5 @@
--- Run in Supabase SQL editor
+-- Run in the Supabase SQL editor.
+-- Only the server, using the service role key, should read or write this table.
 
 create table if not exists car_images (
   cache_key text primary key,
@@ -10,4 +11,5 @@ create table if not exists car_images (
 );
 
 alter table car_images enable row level security;
-create policy "Allow all" on car_images for all using (true) with check (true);
+
+drop policy if exists "Allow all" on car_images;
