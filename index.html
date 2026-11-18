@@ -78,7 +78,14 @@
     box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
   }
   .btn-secondary:hover { background: #f3f7fc; border-color: #1370d0; color: #1370d0; }
-  .listings-locked { filter: blur(10px); pointer-events: none; user-select: none; max-height: 320px; overflow: hidden; }
+  #listingsBody.listings-in .rec-card { animation: riseIn .55s ease both; }
+  #listingsBody.listings-in .rec-card:nth-child(2) { animation-delay: .08s; }
+  #listingsBody.listings-in .rec-card:nth-child(3) { animation-delay: .16s; }
+  #listingsBody.listings-in .rec-card:nth-child(4) { animation-delay: .24s; }
+  #listingsBody.listings-in .rec-card:nth-child(5) { animation-delay: .32s; }
+  #listingsBody.listings-in .rec-card:nth-child(6) { animation-delay: .4s; }
+  @keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  #inquiryModal.sent .form-group, #inquiryModal.sent #submitInquiry, #inquiryModal.sent .privacy { display: none; }
   .listings-lock { position: absolute; left: 0; right: 0; top: 2.4rem; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; text-align: center; padding: 1rem; background: linear-gradient(180deg, rgba(245,247,250,0.2), rgba(245,247,250,0.9) 42%); border-radius: 14px; }
   .unlock-btn { font-size: 1.08rem; padding: 1rem 1.6rem; min-width: min(100%, 300px); box-shadow: 0 8px 22px rgba(19, 112, 208, 0.28); }
   .listings-lock p { margin: 0; color: var(--muted); font-size: 0.88rem; max-width: 340px; }
@@ -1077,27 +1084,38 @@ async function pullListings(car, distance, useZip) {
       image: (r.primaryImage || '').replace('http:', 'https:'),
       location: (r.city && r.state) ? r.city + ', ' + r.state : 'Farther away',
       dealer: r.dealer || '',
-      vdp: r.vdp || '',
+      vdp: r.vdp || r.vdpUrl || r.url || r.link || item.vdp || item.url || '',
       vin: v.vin
     };
   }).filter(x => x.price > 0);
 }
 
-async function keepWorkingLinks(listings) {
+function listingSearchUrl(car) {
+  const zip = (document.getElementById('zip') && document.getElementById('zip').value) || '';
+  const year = car.year || '';
+  const make = encodeURIComponent(car.make || '');
+  const model = encodeURIComponent(car.model || '');
+  return 'https://www.cars.com/shopping/results/?stock_type=used&makes[]=' + make + '&models[]=' + model + '&zip=' + encodeURIComponent(zip) + '&maximum_distance=100&year_min=' + year + '&year_max=' + year;
+}
+function withListingLink(car, listing) {
+  const direct = listing.vdp && /^https:\/\//i.test(listing.vdp) ? listing.vdp : '';
+  return Object.assign({}, listing, { vdp: direct || listingSearchUrl(car) });
+}
+async function keepWorkingLinks(car, listings) {
   const urls = [...new Set(listings.map(l => l.vdp).filter(u => /^https:\/\//i.test(u)))];
-  if (!urls.length) return listings.map(l => ({ ...l, vdp: '' }));
-  try {
-    const res = await fetch('/api/check-links', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ urls })
-    });
-    const data = await res.json();
-    const ok = new Set((data.results || []).filter(r => r.ok).map(r => r.url));
-    return listings.map(l => ({ ...l, vdp: ok.has(l.vdp) ? l.vdp : '' }));
-  } catch {
-    return listings.map(l => ({ ...l, vdp: '' }));
+  let dead = new Set();
+  if (urls.length) {
+    try {
+      const res = await fetch('/api/check-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls })
+      });
+      const data = await res.json();
+      dead = new Set((data.results || []).filter(r => r.dead).map(r => r.url));
+    } catch (e) {}
   }
+  return listings.map(l => withListingLink(car, dead.has(l.vdp) ? Object.assign({}, l, { vdp: '' }) : l));
 }
 
 async function fetchLiveForCar(car) {
@@ -1110,7 +1128,7 @@ async function fetchLiveForCar(car) {
       outsideArea = true;
     }
     if (!listings || !listings.length) return { listings: [], outsideArea: true };
-    listings = await keepWorkingLinks(listings);
+    listings = await keepWorkingLinks(car, listings);
     return { listings, outsideArea };
   } catch (e) {
     return null;
@@ -1156,7 +1174,7 @@ async function fetchLiveListings(budget, prefs, distance = 50) {
         image: (r.primaryImage || r.images?.[0]?.url || r.images?.[0] || '').toString().replace('http:', 'https:') || photoUrl(v.make, v.model, v.year),
         location: (r.city && r.state) ? `${r.city}, ${r.state}` : (r.dealer?.city ? `${r.dealer.city}, ${r.dealer.state}` : 'US'),
         dealer: r.dealer || r.dealerName || '',
-        vdp: r.vdp || '',
+        vdp: r.vdp || r.vdpUrl || r.url || r.link || item.vdp || item.url || '',
         carfaxUrl: r.carfaxUrl || '',
         insight: 'Live from Auto.dev',
         vin: v.vin,
@@ -1321,21 +1339,18 @@ function carFacts(car) {
   };
 }
 function askOnPage2(id, ev) {
-  if (ev && ev.stopPropagation) ev.stopPropagation();
-  if (onDetailsPage()) return;
+  if (ev) {
+    if (ev.preventDefault) ev.preventDefault();
+    if (ev.stopPropagation) ev.stopPropagation();
+  }
   const car = findCar(id);
-  window._currentId = id;
-  window._currentCar = car;
   if (!car) {
     alert('That car is no longer in this list. Search again, then check availability.');
     return;
   }
-  if (!document.getElementById('step2') || document.getElementById('step2').classList.contains('hidden')) return;
-  if (hasContact()) {
-    sendLead(loadProfile(), car);
-    showSavedToast(car);
-    return;
-  }
+  window._currentId = id;
+  window._currentCar = car;
+  window._formForListings = false;
   openInquiry();
 }
 function schedulePage1() {
@@ -1585,7 +1600,7 @@ async function showDetail(id) { window._currentId = id;
         <div class="price">$${Number(l.price || 0).toLocaleString()}</div>
         <div style="font-size:0.8rem;color:var(--muted)">${Number(l.mileage || 0).toLocaleString()} mi • ${esc(l.location || '')}</div>
         <div class="card-actions">
-          ${l.vdp ? `<button class="btn" type="button" data-vdp="${esc(l.vdp)}" onclick="gateDealer(0, this.dataset.vdp)">View at Dealer</button>` : ''}
+          <button class="btn" type="button" data-vdp="${esc(l.vdp)}" onclick="gateDealer(0, this.dataset.vdp)">View listing</button>
         </div>
       </div>
     </div>`).join('');
@@ -1593,7 +1608,7 @@ async function showDetail(id) { window._currentId = id;
   const listingsBlock = live.length
     ? `<div id="listingsGate" style="position:relative;margin-top:1.4rem">
         <h3 style="margin:0 0 0.6rem">Available cars</h3>
-        <div id="listingsBody" class="${locked ? 'listings-locked' : ''}">
+        <div id="listingsBody" class="${locked ? 'listings-locked' : 'listings-in'}">
           ${stockNote}
           <div class="grid-3">${listingCards}</div>
         </div>
@@ -1719,7 +1734,12 @@ function unlockListings() {
 function revealListings() {
   const body = document.getElementById('listingsBody');
   const lock = document.getElementById('listingsLock');
-  if (body) body.classList.remove('listings-locked');
+  if (body) {
+    body.classList.remove('listings-locked');
+    body.classList.remove('listings-in');
+    void body.offsetWidth;
+    body.classList.add('listings-in');
+  }
   if (lock) lock.remove();
   window._formForListings = false;
 }
@@ -1837,28 +1857,36 @@ function showSavedToast(car) {
 }
 function openInquiry(e) {
   if (e && e.stopPropagation) e.stopPropagation();
-  if (onDetailsPage() && !window._formForListings) return;
+  const modal = document.getElementById('inquiryModal');
+  if (!modal) return;
   const c = window._currentCar || findCar(window._currentId);
   const saved = loadProfile();
+  modal.classList.remove('sent');
+  modal.style.display = 'flex';
+  const success = document.getElementById('inquirySuccess');
+  if (success) success.style.display = 'none';
   if (hasContact()) {
-    if (c) {
-      sendLead(saved, c);
-      showSavedToast(c);
+    if (c) sendLead(saved, c);
+    modal.classList.add('sent');
+    if (success) {
+      success.textContent = 'Request sent for ' + (c ? (c.year + ' ' + c.make + ' ' + c.model) : 'this car') + '. We already have your info.';
+      success.style.display = 'block';
     }
+    const title = document.getElementById('modalVehicle');
+    if (title) title.textContent = 'Availability request sent.';
     return;
   }
   applyProfile(saved);
-  if (!document.getElementById('inqZip').value && document.getElementById('zip')) {
-    document.getElementById('inqZip').value = document.getElementById('zip').value || '';
+  const zipField = document.getElementById('inqZip');
+  if (zipField && !zipField.value && document.getElementById('zip')) {
+    zipField.value = document.getElementById('zip').value || '';
   }
-  document.getElementById('modalVehicle').textContent = window._formForListings
-    ? ('Unlock listings for the ' + c.year + ' ' + c.make + ' ' + c.model)
-    : (c
-    ? ('Checking ' + c.year + ' ' + c.make + ' ' + c.model + (c.trim ? ' ' + c.trim : '') + ' · $' + Number(c.price || 0).toLocaleString() + ' · ' + Number(c.mileage || 0).toLocaleString() + ' mi')
-    : 'Tell us how to reach you for this car.');
-  const modal = document.getElementById('inquiryModal');
-  modal.style.display = 'flex';
-  document.getElementById('inquirySuccess').style.display = 'none';
+  const title = document.getElementById('modalVehicle');
+  if (title) {
+    title.textContent = c
+      ? ((window._formForListings ? 'Unlock listings for the ' : 'Checking ') + c.year + ' ' + c.make + ' ' + c.model + (c.trim ? ' ' + c.trim : ''))
+      : 'Tell us how to reach you for this car.';
+  }
   const name = document.getElementById('inqName');
   if (name && !name.value) name.focus();
 }
