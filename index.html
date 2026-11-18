@@ -11,6 +11,17 @@
   body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); }
   .app { max-width:1100px; margin:0 auto; padding:1rem; }
   header { display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0 1rem; border-bottom:1px solid var(--border); margin-bottom:1.25rem; }
+  .hero-show { position:relative; height:min(380px, 56vw); min-height:190px; border-radius:16px; overflow:hidden; margin-bottom:1rem; background:#eef3f8; }
+  .hero-slide { display:none; position:absolute; inset:0; }
+  .hero-slide.active { display:block; }
+  .hero-show img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+  .hero-slide.explain img { object-fit:contain; background:#f7f9fc; }
+  .hero-nav { position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.9); background:rgba(255,255,255,.88); color:#1a2332; cursor:pointer; font:inherit; font-size:1.1rem; z-index:2; }
+  .hero-prev { left:10px; }
+  .hero-next { right:10px; }
+  .hero-dots { position:absolute; left:0; right:0; bottom:10px; display:flex; justify-content:center; gap:6px; z-index:2; }
+  .hero-dot { width:8px; height:8px; border-radius:50%; border:0; background:rgba(26,35,50,.28); padding:0; cursor:pointer; }
+  .hero-dot.on { background:#1370d0; }
   .logo { font-size:1.45rem; font-weight:800; color:#1370d0; letter-spacing:-0.03em; background:none; border:0; padding:0; cursor:pointer; font-family:inherit; }
   .steps { font-size:0.82rem; color:var(--muted); }
   .steps .active { color:var(--accent); font-weight:600; }
@@ -145,7 +156,20 @@
 
   <!-- STEP 1 -->
   <div id="step1">
-    <img src="/hero.jpg" alt="A better used SUV instead of a new ordinary car" style="width:100%;max-height:340px;object-fit:cover;object-position:center;border-radius:16px;margin-bottom:1rem;display:block;background:#e8eef5">
+    <div class="hero-show" id="heroShow">
+      <div class="hero-slide active">
+        <img src="/hero.jpg" alt="A better used SUV instead of a new ordinary car">
+      </div>
+      <div class="hero-slide explain">
+        <img src="/hero-explain.jpg" alt="Same budget, stronger car. A pre-owned upgrade, with payment and maintenance shown, and live listings near you.">
+      </div>
+      <button class="hero-nav hero-prev" type="button" aria-label="Previous slide">‹</button>
+      <button class="hero-nav hero-next" type="button" aria-label="Next slide">›</button>
+      <div class="hero-dots">
+        <button class="hero-dot on" type="button" aria-label="Car photo"></button>
+        <button class="hero-dot" type="button" aria-label="How DealWheel works"></button>
+      </div>
+    </div>
     <div class="card" style="margin-bottom:1rem">
       <h2 style="margin:0 0 0.4rem;font-size:1.7rem;letter-spacing:-0.03em">A better car for the same money</h2>
       <p style="color:var(--muted);margin:0 0 1rem;line-height:1.5">Compare the car you were about to buy with a stronger pre-owned one in the same budget.</p>
@@ -1903,6 +1927,32 @@ document.getElementById('shortlistToggle').onclick = () => {
   renderShortlist();
 };
 renderShortlist();
+(function initHero() {
+  const root = document.getElementById('heroShow');
+  if (!root) return;
+  const slides = [...root.querySelectorAll('.hero-slide')];
+  const dots = [...root.querySelectorAll('.hero-dot')];
+  let i = 0;
+  let timer;
+  function show(n) {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    dots.forEach((d, idx) => d.classList.toggle('on', idx === i));
+  }
+  function start() {
+    clearInterval(timer);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    timer = setInterval(() => show(i + 1), 6000);
+  }
+  dots.forEach((d, idx) => { d.onclick = () => { show(idx); start(); }; });
+  const prev = root.querySelector('.hero-prev');
+  const next = root.querySelector('.hero-next');
+  if (prev) prev.onclick = () => { show(i - 1); start(); };
+  if (next) next.onclick = () => { show(i + 1); start(); };
+  root.addEventListener('mouseenter', () => clearInterval(timer));
+  root.addEventListener('mouseleave', start);
+  start();
+})();
 
 </script>
 </body>
