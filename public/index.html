@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DealWheel AI — Full Preview</title>
+  <meta name="dealwheel-build" content="2026-11-18-github-hero">
+<style>
+  :root { --bg:#f5f7fa; --surface:#ffffff; --surface-2:#f0f3f7; --border:#e2e8f0; --text:#1a2332; --muted:#5c6b7a; --accent:#1370d0; --success:#0f8a4b; --radius:12px; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); }
+  .app { max-width:1100px; margin:0 auto; padding:1rem; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0 1rem; border-bottom:1px solid var(--border); margin-bottom:1.25rem; }
+  .logo { font-size:1.45rem; font-weight:800; color:#1370d0; letter-spacing:-0.03em; }
+  .steps { font-size:0.82rem; color:var(--muted); }
+  .steps .active { color:var(--accent); font-weight:600; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; box-shadow:0 1px 2px rgba(16,24,40,0.04); }
+  .label { display:block; margin-bottom:0.3rem; font-size:0.82rem; color:var(--muted); }
+  .form-group { margin-bottom:1rem; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .grid-3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.1rem; }
+  body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); padding-bottom:env(safe-area-inset-bottom); }
+  .input, textarea, select { width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:0.65rem 0.85rem; color:var(--text); font-size:16px; }
+  .input::placeholder, textarea::placeholder { color:#6b7280; font-weight:300; opacity:1; }
+  .skel { background:linear-gradient(90deg,#eef2f6 25%,#e2e8f0 37%,#eef2f6 63%); background-size:400% 100%; animation:shimmer 1.2s ease infinite; border-radius:8px; }
+  @keyframes shimmer { 0%{background-position:100% 0} 100%{background-position:0 0} }
+  .sticky-cta { display:none; }
+  .privacy { font-size:0.75rem; color:var(--muted); line-height:1.4; margin:0.4rem 0 0.8rem; }
+  input[type=range] { width:100%; height:7px; accent-color:var(--accent); }
+  .budget-value { font-size:1.5rem; font-weight:700; color:#1370d0; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    background: var(--accent);
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 0.72rem 1.15rem;
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 650;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(19, 112, 208, 0.18);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover { background: #0d5cb3; }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+  .btn-secondary {
+    background: #fff;
+    color: #1a2332;
+    border-color: #d5deea;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  }
+  .btn-secondary:hover { background: #f3f7fc; border-color: #1370d0; color: #1370d0; }
+  #backTo1, #backTo2, #prevLot, #nextLot {
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    box-shadow: none;
+  }
+  .nl { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:0.9rem; margin-bottom:1rem; }
+  .checks { display:flex; gap:1.2rem; flex-wrap:wrap; margin:0.5rem 0; font-size:0.9rem; }
+  .checks label { display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .rec-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:0 1px 2px rgba(16,24,40,0.05); }
+  .rec-card img { width:100%; height:180px; object-fit:cover; object-position:center 45%; }
+  .card-actions { display:flex; gap:0.4rem; margin-top:0.4rem; }
+  .card-actions .btn { flex:1; min-height:44px; }
+  .rec-card .c { padding:0.9rem; }
+  .rec-card h3 { margin:0 0 0.2rem; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .price { font-size:1.25rem; font-weight:700; color:var(--success); }
+  .badge { background:#e8f2fc; color:#1370d0; padding:0.1rem 0.45rem; border-radius:999px; font-size:0.72rem; }
+  .insight { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:0.65rem 0.7rem; font-size:0.82rem; margin:0.55rem 0 0.45rem; }
+  .deal-kicker { font-size:0.68rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:#1370d0; margin-bottom:0.25rem; }
+  .deal-sub { margin:0.25rem 0 0; color:var(--muted); font-size:0.75rem; line-height:1.35; }
+  .deal-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:0.35rem; margin-top:0.5rem; }
+  .deal-metrics div { background:#fff; border:1px solid var(--border); border-radius:8px; padding:0.35rem 0.25rem; text-align:center; }
+  .deal-metrics b { display:block; font-size:0.78rem; color:var(--text); }
+  .deal-metrics span { display:block; font-size:0.62rem; color:var(--muted); margin-top:0.1rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.45rem; }
+  .cmp { width:100%; border-collapse:collapse; font-size:0.88rem; margin-top:0.4rem; }
+  .cmp th, .cmp td { text-align:right; padding:0.5rem 0.4rem; border-bottom:1px solid var(--border); }
+  .cmp th:first-child, .cmp td:first-child { text-align:left; }
+  .cmp th { font-size:0.75rem; color:var(--muted); font-weight:600; }
+  .cmp td:first-child { color:var(--muted); }
+  .cmp tr.total td { font-weight:700; color:var(--text); }
+  .hidden { display:none !important; }
+  .note { font-size:0.78rem; color:var(--muted); margin-bottom:0.75rem; }
+  @media (max-width:640px) {
+    .grid-2 { grid-template-columns:1fr; }
+    .app { padding:0.75rem; }
+    header { flex-direction:column; align-items:flex-start; gap:0.6rem; padding:0.4rem 0 0.8rem; }
+    .logo { font-size:1.25rem; }
+    .header-right { width:100%; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
+    .steps { font-size:0.72rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .steps span { display:inline; }
+    #shortlistToggle { padding:0.3rem 0.55rem !important; font-size:0.75rem !important; flex-shrink:0; }
+    .card { padding:1rem; }
+    .rec-card img { aspect-ratio:4/3; height:auto; object-fit:cover; object-position:center; }
+    .card-actions { flex-direction:column; }
+    .card-actions .btn { width:100%; min-height:48px; }
+    .detail-actions { flex-direction:column !important; }
+    .detail-actions .btn { width:100% !important; min-height:48px; }
+    .sticky-cta:not(.hidden) { display:block; position:fixed; left:0; right:0; bottom:0; z-index:40; padding:0.6rem 0.75rem calc(0.6rem + env(safe-area-inset-bottom)); background:rgba(255,255,255,0.96); border-top:1px solid var(--border); }
+    #step3 { padding-bottom:4.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">DealWheel AI</div>
+    <div class="header-right" style="display:flex;align-items:center;gap:1rem">
+      <div class="steps">
+        <span id="s1" class="active" onclick="goStep(1)" style="cursor:pointer">1. Intake</span> →
+        <span id="s2" onclick="goStep(2)" style="cursor:pointer">2. Recs</span> →
+        <span id="s3" onclick="goStep(3)" style="cursor:pointer">3. Details</span>
+      </div>
+      <button class="btn btn-secondary" id="shortlistToggle" style="padding:0.35rem 0.7rem;font-size:0.8rem">♡ Shortlist (0)</button>
+    </div>
+  </header>
+  <div id="shortlistPanel" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.8rem;margin-bottom:1rem">
+    <div style="font-weight:600;margin-bottom:0.4rem">Your shortlist <span style="color:var(--muted);font-weight:400">(max 4)</span></div>
+    <div id="shortlistContent"></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <img src="/hero.jpg" alt="A better used SUV instead of a new ordinary car" style="width:100%;max-height:340px;object-fit:cover;object-position:center;border-radius:16px;margin-bottom:1rem;display:block;background:#e8eef5">
+    <div class="card" style="margin-bottom:1rem">
+      <h2 style="margin:0 0 0.4rem;font-size:1.7rem;letter-spacing:-0.03em">A better car for the same money</h2>
+      <p style="color:var(--muted);margin:0 0 1rem;line-height:1.5">DealWheel compares the new car you were about to buy with stronger pre-owned options in the same budget. Often that is a newer luxury or sport model that has already taken the big depreciation hit.</p>
+      <div class="grid-3">
+        <div>
+          <div style="font-weight:700;color:#1370d0;margin-bottom:0.2rem">1. Tell us the car</div>
+          <div style="color:var(--muted);font-size:0.88rem;line-height:1.4">Budget, body style, and what you care about. A sentence is enough.</div>
+        </div>
+        <div>
+          <div style="font-weight:700;color:#1370d0;margin-bottom:0.2rem">2. See three better fits</div>
+          <div style="color:var(--muted);font-size:0.88rem;line-height:1.4">We rank pre-owned cars near your price, with payment and ownership cost.</div>
+        </div>
+        <div>
+          <div style="font-weight:700;color:#1370d0;margin-bottom:0.2rem">3. Check a real listing</div>
+          <div style="color:var(--muted);font-size:0.88rem;line-height:1.4">Open the cars near your zip. Your contact info is asked once, then remembered.</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">Tell us the car you were looking at</h2>
+      <p style="color:var(--muted)">We’ll suggest stronger pre-owned alternatives for the same money.</p>
+
+      <div class="form-group">
+        <label class="label">What are you thinking?</label>
+        <input class="input" id="smartInput" placeholder="e.g. reliable, room for kids, sporty feel, low miles">
+        <button type="button" class="btn btn-secondary" id="parseSmart" style="margin-top:0.4rem">Parse & Search</button>
+      </div>
+
+      <div class="form-group">
+        <label class="label">New car you are considering to buy</label>
+        <input class="input" id="considering" placeholder="e.g. Honda Accord">
+      </div>
+
+      <div class="form-group">
+        <label class="label">Budget</label>
+        <div class="budget-value" id="budgetDisplay">$45,000</div>
+        <input type="range" id="budget" min="15000" max="150000" step="1000" value="45000" oninput="document.getElementById('budgetDisplay').textContent='$'+Number(this.value).toLocaleString()">
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted)"><span>$15k</span><span>$150k</span></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="label">New car type</label>
+          <div class="dropdown" id="carTypeDropdown" style="position:relative">
+            <div class="dropdown-toggle input" id="carTypeToggle" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+              <span id="carTypeLabel">All</span>
+              <span style="font-size:0.7rem;color:var(--muted)">▼</span>
+            </div>
+            <div class="dropdown-menu" id="carTypeMenu" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-top:4px;padding:0.5rem;z-index:10;max-height:220px;overflow-y:auto">
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="all" checked> All</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="sedan"> Sedan</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="suv"> SUV</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="crossover"> Crossover</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="sports"> Sports / Coupe</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="truck"> Truck / Pickup</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="luxury"> Luxury</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="electric"> Electric / Hybrid</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:0.4rem 0.3rem;cursor:pointer"><input type="checkbox" class="car-type" value="wagon"> Wagon / Hatchback</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="label">Preferred brand</label>
+          <div class="dropdown" id="brandDropdown" style="position:relative">
+            <div class="dropdown-toggle input" id="brandToggle" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+              <span id="brandLabel">All</span>
+              <span style="font-size:0.7rem;color:var(--muted)">▼</span>
+            </div>
+            <div class="dropdown-menu" id="brandMenu" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;margin-top:4px;padding:0.5rem;z-index:20;max-height:240px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="label">Zip code</label>
+          <input class="input" id="zip" value="78701">
+        </div>
+        <div class="form-group">
+          <label class="label">Min year</label>
+          <input class="input" id="minYear" type="number" value="2018">
+        </div>
+        <div class="form-group">
+          <label class="label">Max mileage</label>
+          <select class="input" id="maxMiles">
+            <option value="10000">Under 10,000</option>
+            <option value="20000">Under 20,000</option>
+            <option value="30000">Under 30,000</option>
+            <option value="50000">Under 50,000</option>
+            <option value="75000">Under 75,000</option>
+            <option value="999999" selected>Any mileage</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="checks">
+        <label><input type="checkbox" id="luxury" checked> Luxury</label>
+        <label><input type="checkbox" id="sport"> Sport</label>
+        <label><input type="checkbox" id="reliability" checked> Reliability</label>
+      </div>
+
+      <button class="btn" id="findBtn" style="width:100%">Find Better Deals</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" class="hidden">
+    <div class="note" id="deckNote"></div>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.35rem;align-items:flex-end">
+      <div style="flex:1;min-width:220px">
+        <label class="label" style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Budget: <strong id="tab2BudgetDisplay">$45,000</strong></label>
+        <input type="range" id="tab2Budget" min="15000" max="150000" step="1000" value="45000" style="width:100%;accent-color:var(--accent);margin:0 0 0.35rem" oninput="filterTab2()" onchange="filterTab2()">
+      </div>
+      <div style="width:160px">
+        <label class="label" style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Max mileage</label>
+        <select id="tab2Miles" class="input" style="padding:0.55rem;height:42px" onchange="filterTab2()">
+          <option value="10000">Under 10k</option>
+          <option value="20000">Under 20k</option>
+          <option value="30000">Under 30k</option>
+          <option value="50000">Under 50k</option>
+          <option value="75000">Under 75k</option>
+          <option value="999999" selected>Any</option>
+        </select>
+      </div>
+      <div style="width:170px;position:relative">
+        <label class="label" style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Brand</label>
+        <div class="dropdown-toggle input" id="tab2BrandToggle" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;height:42px">
+          <span id="tab2BrandLabel">All</span>
+          <span style="font-size:0.7rem;color:var(--muted)">▼</span>
+        </div>
+        <div id="tab2BrandMenu" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;margin-top:4px;padding:0.5rem;z-index:20;max-height:240px;overflow-y:auto"></div>
+      </div>
+      <div style="width:150px">
+        <label class="label" style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Type</label>
+        <select id="tab2Type" class="input" style="padding:0.55rem;height:42px" onchange="filterTab2()">
+          <option value="all">All</option>
+          <option value="suv">SUV</option>
+          <option value="sedan">Sedan</option>
+          <option value="sports">Sports</option>
+          <option value="electric">Electric</option>
+          <option value="truck">Truck</option>
+          <option value="wagon">Wagon</option>
+          <option value="convertible">Convertible</option>
+        </select>
+      </div>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:0.75rem;margin:0 0 0.8rem;cursor:pointer">
+      <input type="checkbox" id="tab2Similar" onchange="filterTab2()"> Similar styles
+    </label>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+      <h2 style="margin:0" id="deckTitle">Better alternatives</h2>
+      <div style="display:flex;gap:0.4rem">
+        <button class="btn btn-secondary" id="prevLot" disabled>← Previous</button>
+        <button class="btn btn-secondary" id="nextLot">Next Best Lot →</button>
+      </div>
+    </div>
+    <div class="grid-3" id="deck"></div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-secondary" id="backTo1">← Edit search</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="step3" class="hidden">
+    <button class="btn btn-secondary" id="backTo2" style="margin-bottom:1rem">← Back to recommendations</button>
+    <div class="card" id="detail"></div>
+  </div>
+</div>
+
+<div id="stickyCta" class="sticky-cta hidden">
+  <button class="btn" id="stickyInquiry" style="width:100%;min-height:48px">Request Info</button>
+  <div class="privacy" style="text-align:center;margin:0.35rem 0 0">Shared only with the dealer for this car.</div>
+</div>
+
+<div id="inquiryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;width:90%;max-width:420px;position:relative">
+    <button id="closeModal" style="position:absolute;top:0.6rem;right:0.8rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer">×</button>
+    <h3 style="margin:0 0 0.4rem">Request Info</h3>
+    <p id="modalVehicle" style="color:var(--muted);margin:0 0 1rem;font-size:0.9rem"></p>
+    <div class="form-group">
+      <label class="label">Name</label>
+      <input class="input" id="inqName" autocomplete="name" placeholder="Your name" required>
+    </div>
+    <div class="form-group">
+      <label class="label">Email</label>
+      <input class="input" id="inqEmail" type="email" autocomplete="email" placeholder="you@email.com" required>
+    </div>
+    <div class="form-group">
+      <label class="label">Phone <span style="font-weight:400">(optional)</span></label>
+      <input class="input" id="inqPhone" type="tel" autocomplete="tel" placeholder="(555) 123-4567">
+    </div>
+    <div class="form-group">
+      <label class="label">Zip code</label>
+      <input class="input" id="inqZip" placeholder="78701">
+    </div>
+    <div class="form-group">
+      <label class="label">Purchase timeline</label>
+      <select class="input" id="inqTimeline">
+        <option value="asap">ASAP</option>
+        <option value="1-2 weeks">1–2 weeks</option>
+        <option value="1 month">Within a month</option>
+        <option value="1-3 months">1–3 months</option>
+        <option value="researching">Just researching</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="label">Financing</label>
+      <select class="input" id="inqFinance">
+        <option value="cash">Cash</option>
+        <option value="finance">Need financing</option>
+        <option value="trade">Have a trade-in</option>
+        <option value="unsure">Not sure yet</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="label">Message</label>
+      <textarea class="input" id="inqMsg" rows="2" placeholder="I'm interested in this vehicle..."></textarea>
+    </div>
+    <label class="privacy" style="display:flex;gap:8px;align-items:flex-start">
+      <input type="checkbox" id="inqConsent" style="margin-top:3px">
+      <span>I agree DealWheel may share my name, email, and phone with the dealer for each vehicle I ask about. We remember it on this phone so you only enter it once.</span>
+    </label>
+    <button class="btn" id="submitInquiry" style="width:100%">Send Inquiry</button>
+    <div id="inquirySuccess" style="display:none;margin-top:0.8rem;color:var(--success);font-weight:600"></div>
+  </div>
+</div>
+<script>
+const MOCK = [
+  // Sedans
+  { id:1, year:2022, make:'BMW', model:'3 Series', trim:'330i', price:34500, mileage:25000, type:'sedan', luxury:true, sport:false, image:'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg', location:'Austin, TX', insight:'Strong compact luxury' },
+  { id:2, year:2021, make:'Audi', model:'A4', trim:'Premium', price:32800, mileage:28000, type:'sedan', luxury:true, sport:false, image:'https://stimg.cardekho.com/images/carexteriorimages/630x420/Audi/A4/8223/1659949870180/front-left-side-47.jpg', location:'Houston, TX', insight:'Low-mile A4' },
+  { id:3, year:2020, make:'Mercedes-Benz', model:'C-Class', trim:'C 300', price:29500, mileage:32000, type:'sedan', luxury:true, sport:false, image:'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg', location:'Dallas, TX', insight:'Well-depreciated C-Class' },
+  { id:4, year:2022, make:'Honda', model:'Accord', trim:'Sport', price:26500, mileage:22000, type:'sedan', luxury:false, sport:false, image:'https://www.honda.com/content/dam/honda/na/us/english/vehicles/accord/accord-sedan/2023/exterior/2023-accord-sport-still-night-pearl.jpg', location:'Houston, TX', insight:'Solid midsize sedan' },
+  { id:5, year:2021, make:'BMW', model:'5 Series', trim:'540i', price:48500, mileage:22000, type:'sedan', luxury:true, sport:false, image:'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg', location:'Dallas, TX', insight:'Midsize luxury sedan' },
+  { id:6, year:2022, make:'Mercedes-Benz', model:'E-Class', trim:'450', price:52500, mileage:19000, type:'sedan', luxury:true, sport:false, image:'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg', location:'Houston, TX', insight:'E-Class 450' },
+  { id:7, year:2021, make:'Mercedes-Benz', model:'S-Class', trim:'S 580', price:68500, mileage:22000, type:'sedan', luxury:true, sport:false, image:'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg', location:'Houston, TX', insight:'Flagship S-Class' },
+  // SUVs / Crossovers
+  { id:8, year:2023, make:'BMW', model:'X3', trim:'xDrive30i', price:44500, mileage:14000, type:'suv', luxury:true, sport:false, image:'https://hips.hearstapps.com/mtg-prod/65c32f57db90fc0008bda9f5/2020-bmw-x3m-competition-front-three-quarter-in-motion-1.jpg', location:'Austin, TX', insight:'Popular compact luxury SUV' },
+  { id:9, year:2022, make:'Audi', model:'Q5', trim:'Premium Plus', price:42800, mileage:19000, type:'suv', luxury:true, sport:false, image:'https://upload.wikimedia.org/wikipedia/commons/6/6d/Audi_Q5_2.0_TDI_quattro_S_line_%28GU%29_%E2%80%93_f_13102025.jpg', location:'Houston, TX', insight:'Well-equipped Q5' },
+  { id:10, year:2023, make:'Mercedes-Benz', model:'GLC', trim:'300', price:45200, mileage:12000, type:'suv', luxury:true, sport:false, image:'https://dealerinspire-image-library-prod.s3.us-east-1.amazonaws.com/images/qX42MjIcDnXNHmUJWKoJYMg2glkHkFRJmBSRvMoF.png', location:'Dallas, TX', insight:'Current GLC' },
+  { id:11, year:2022, make:'Porsche', model:'Macan', trim:'S', price:48500, mileage:22000, type:'suv', luxury:true, sport:true, image:'https://pictures.porsche.com/rtt/iris?COSY-EU-100-1711coMvsi60AAt5FwcmBEgA4qP8iBUDxPE3Cb9pNXuBuNXdMGF4tl3U0%25z8rMHIspbWvanYb%255y%25oq%25vSTmjMXD4qAZeoNBPUSfUx4RmHlCgI7ZB4x7e2HtpQDcFGImVYnfur3165yPew9H2CvNzx4JzGXoq1XuUr6FOb6dHwRuT0RCTx7e2H3t41UzQKTBObsqYS2Lh0iO5M7ZNHcTCkiNDKf2GLumr6FOb34wwRuT0tGmx7e2HLWJ1UzQKINybsqYS5wI0iO5MP4hHcTCkNO6KfyUxFkprU9pNfWKapxdMG0VPni2uFcL%25', location:'Miami, FL', insight:'Macan S under $50k' },
+  { id:12, year:2023, make:'BMW', model:'X5', trim:'xDrive40i', price:62500, mileage:15000, type:'suv', luxury:true, sport:false, image:'https://di-enrollment-api.s3.amazonaws.com/bmw/discover-pages/2024/x5/x5-sdrive40i-%26-x5-xdrive40i.jpg', location:'Dallas, TX', insight:'Full-size X5' },
+  { id:13, year:2023, make:'Porsche', model:'Cayenne', trim:'S', price:74500, mileage:12000, type:'suv', luxury:true, sport:true, image:'https://newsroom.porsche.com/.imaging/mte/porsche-templating-theme/image_1290x726/dam/US-local/Press-Releases/2023/Cayenne_S_E-Hybrid/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg/jcr:content/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg', location:'Dallas, TX', insight:'Cayenne S near $75k' },
+  { id:14, year:2023, make:'Toyota', model:'RAV4', trim:'XLE', price:28500, mileage:18000, type:'suv', luxury:false, sport:false, image:'https://hips.hearstapps.com/autoweek/assets/s3fs-public/2019_lexus_es_front_1_0.jpg?resize=980:*', location:'Austin, TX', insight:'Reliable mainstream SUV' },
+  { id:15, year:2022, make:'Land Rover', model:'Range Rover Sport', trim:'HSE', price:72500, mileage:18000, type:'suv', luxury:true, sport:false, image:'https://www.rangerover.com/content/dam/lrdx/global/l461/25my/int/L46125GL_303104068_THE_SPY_003_DX.jpg.res/JLRHASH28B3D8817AC09B43F4017D234BCC2D402C716031/L46125GL_303104068_THE_SPY_003_DX.jpg', location:'Miami, FL', insight:'Range Rover Sport' },
+  // Electric
+  { id:16, year:2023, make:'Tesla', model:'Model 3', trim:'Long Range', price:38500, mileage:15000, type:'electric', luxury:true, sport:true, image:'https://hips.hearstapps.com/hmg-prod/images/2026-tesla-model-3-standard-120-68e3fb1f4d3ec.jpg?crop=0.792xw:0.668xh;0.159xw,0.221xh&resize=1200:*', location:'Austin, TX', insight:'Low-mile Model 3' },
+  { id:17, year:2022, make:'Tesla', model:'Model Y', trim:'Long Range', price:42500, mileage:18000, type:'electric', luxury:true, sport:false, image:'https://upload.wikimedia.org/wikipedia/commons/e/e7/Tesla_Model_Y_Premium_%28Facelift%29_%E2%80%93_f_05052026.jpg', location:'Houston, TX', insight:'Popular electric SUV' },
+  { id:18, year:2023, make:'BMW', model:'i4', trim:'eDrive40', price:48500, mileage:12000, type:'electric', luxury:true, sport:true, image:'https://www.bmwusa.com/content/dam/bmwusa/i4/2024/overview/BMW-MY24-i4-Overview-Hero-Desktop.jpg', location:'Dallas, TX', insight:'Electric performance sedan' },
+  { id:19, year:2022, make:'Mercedes-Benz', model:'EQE', trim:'350', price:52500, mileage:14000, type:'electric', luxury:true, sport:false, image:'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg', location:'Miami, FL', insight:'Luxury electric sedan' },
+  { id:20, year:2023, make:'Audi', model:'Q4 e-tron', trim:'Premium', price:44500, mileage:11000, type:'electric', luxury:true, sport:false, image:'https://www.audiusa.com/content/dam/nemo/us/models/q4-e-tron/q4-e-tron/my24/1920x1080-Q4_e-tron_Front_3-4.jpg', location:'Austin, TX', insight:'Compact electric SUV' },
+  { id:21, year:2021, make:'Porsche', model:'Taycan', trim:'4S', price:78500, mileage:16000, type:'electric', luxury:true, sport:true, image:'https://media.wired.com/photos/5d8e7990cac1be000849ccd9/4:3/w_1776,h_1332,c_limit/Transpo_Taycan-Turbo_Taycan-Turbo-S-(6).jpg', location:'Dallas, TX', insight:'High-performance electric' },
+  // Sports / Coupe
+  { id:22, year:2023, make:'BMW', model:'M3', trim:'Competition', price:74500, mileage:9000, type:'sports', luxury:true, sport:true, image:'https://www.hagerty.co.uk/wp-content/uploads/2020/09/New-2021-BMW-M3-Competition-19-1024x577.jpg', location:'Miami, FL', insight:'M3 Competition low miles' },
+  { id:23, year:2022, make:'Porsche', model:'718 Cayman', trim:'S', price:78000, mileage:8000, type:'sports', luxury:true, sport:true, image:'https://www.hagerty.co.uk/wp-content/uploads/2020/09/New-2021-BMW-M3-Competition-19-1024x577.jpg', location:'Dallas, TX', insight:'Mid-engine sports car' },
+  { id:24, year:2021, make:'Chevrolet', model:'Corvette', trim:'Stingray', price:68500, mileage:12000, type:'sports', luxury:false, sport:true, image:'https://www.hagerty.co.uk/wp-content/uploads/2020/09/New-2021-BMW-M3-Competition-19-1024x577.jpg', location:'Austin, TX', insight:'American sports car' },
+  // Trucks
+  { id:25, year:2022, make:'Ford', model:'F-150', trim:'Lariat', price:48500, mileage:25000, type:'truck', luxury:false, sport:false, image:'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg', location:'Houston, TX', insight:'Well-equipped half-ton' },
+  { id:26, year:2023, make:'Ram', model:'1500', trim:'Limited', price:52500, mileage:18000, type:'truck', luxury:true, sport:false, image:'https://di-uploads-pod12.dealerinspire.com/universitydodgeram/uploads/2022/09/UDodge-Ram-1500-Limited-Elite.jpg', location:'Dallas, TX', insight:'Luxury half-ton truck' },
+  { id:27, year:2021, make:'Toyota', model:'Tundra', trim:'Limited', price:45500, mileage:28000, type:'truck', luxury:false, sport:false, image:'https://hips.hearstapps.com/autoweek/assets/s3fs-public/2019_lexus_es_front_1_0.jpg?resize=980:*', location:'Austin, TX', insight:'Reliable full-size truck' },
+  // Wagons / Hatchbacks
+  { id:28, year:2022, make:'Audi', model:'A4 allroad', trim:'Premium', price:38500, mileage:20000, type:'wagon', luxury:true, sport:false, image:'https://stimg.cardekho.com/images/carexteriorimages/630x420/Audi/A4/8223/1659949870180/front-left-side-47.jpg', location:'Austin, TX', insight:'All-weather luxury wagon' },
+  { id:29, year:2021, make:'Volkswagen', model:'Golf', trim:'GTI', price:28500, mileage:22000, type:'wagon', luxury:false, sport:true, image:'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg', location:'Houston, TX', insight:'Hot hatch' },
+  // Convertibles
+  { id:30, year:2022, make:'BMW', model:'4 Series', trim:'430i Convertible', price:48500, mileage:15000, type:'convertible', luxury:true, sport:true, image:'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg', location:'Miami, FL', insight:'Open-top luxury' },
+  { id:31, year:2021, make:'Mercedes-Benz', model:'C-Class', trim:'Cabriolet', price:42500, mileage:18000, type:'convertible', luxury:true, sport:false, image:'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg', location:'Dallas, TX', insight:'C-Class convertible' },
+
+  { id:32, year:2023, make:'Porsche', model:'Cayenne', trim:'Turbo', price:98500, mileage:10000, type:'suv', luxury:true, sport:true, image:'https://newsroom.porsche.com/.imaging/mte/porsche-templating-theme/image_1290x726/dam/US-local/Press-Releases/2023/Cayenne_S_E-Hybrid/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg/jcr:content/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg', location:'Miami, FL', insight:'Cayenne Turbo near $100k' },
+  { id:33, year:2022, make:'BMW', model:'X7', trim:'M60i', price:89500, mileage:14000, type:'suv', luxury:true, sport:true, image:'https://di-enrollment-api.s3.amazonaws.com/bmw/discover-pages/2024/x5/x5-sdrive40i-%26-x5-xdrive40i.jpg', location:'Dallas, TX', insight:'Full-size X7 performance' },
+  { id:34, year:2023, make:'Mercedes-Benz', model:'GLE', trim:'63 AMG', price:92500, mileage:11000, type:'suv', luxury:true, sport:true, image:'https://dealerinspire-image-library-prod.s3.us-east-1.amazonaws.com/images/qX42MjIcDnXNHmUJWKoJYMg2glkHkFRJmBSRvMoF.png', location:'Houston, TX', insight:'GLE 63 AMG' },
+  { id:35, year:2021, make:'Porsche', model:'911', trim:'Carrera S', price:105000, mileage:12000, type:'sports', luxury:true, sport:true, image:'https://media.wired.com/photos/5d8e7990cac1be000849ccd9/4:3/w_1776,h_1332,c_limit/Transpo_Taycan-Turbo_Taycan-Turbo-S-(6).jpg', location:'Austin, TX', insight:'Iconic 911 near budget' },
+  { id:36, year:2021, make:'Porsche', model:'Macan', trim:'Base', price:42900, mileage:28000, type:'suv', luxury:true, sport:true, image:'', location:'Austin, TX', insight:'Macan inside a mid budget' },
+  { id:37, year:2023, make:'Genesis', model:'GV70', trim:'2.5T', price:46800, mileage:16000, type:'suv', luxury:true, sport:false, image:'', location:'Houston, TX', insight:'Genesis luxury SUV' },
+  { id:38, year:2022, make:'Genesis', model:'G70', trim:'3.3T', price:34500, mileage:21000, type:'sedan', luxury:true, sport:true, image:'', location:'Dallas, TX', insight:'Sport luxury sedan' },
+  { id:39, year:2022, make:'Genesis', model:'GV60', trim:'Performance', price:41500, mileage:18000, type:'electric', luxury:true, sport:true, image:'', location:'Austin, TX', insight:'Genesis electric crossover' },
+  { id:40, year:2022, make:'Lexus', model:'RX', trim:'350', price:41900, mileage:22000, type:'suv', luxury:true, sport:false, image:'', location:'Houston, TX', insight:'Reliable luxury SUV' },
+  { id:41, year:2022, make:'Acura', model:'MDX', trim:'SH-AWD', price:39800, mileage:24000, type:'suv', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Three-row luxury' },
+  { id:42, year:2022, make:'Volvo', model:'XC60', trim:'B5', price:37500, mileage:20000, type:'suv', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Quiet luxury SUV' },
+  { id:43, year:2023, make:'Rivian', model:'R1S', trim:'Adventure', price:52900, mileage:14000, type:'electric', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Electric adventure SUV' },
+  { id:44, year:2022, make:'Rivian', model:'R1T', trim:'Adventure', price:49900, mileage:16000, type:'electric', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Electric pickup' },
+  { id:45, year:2022, make:'Lucid', model:'Air', trim:'Pure', price:48900, mileage:12000, type:'electric', luxury:true, sport:true, image:'', location:'Miami, FL', insight:'Long-range luxury EV' },
+  { id:46, year:2023, make:'Polestar', model:'2', trim:'Long Range', price:32900, mileage:18000, type:'electric', luxury:true, sport:true, image:'', location:'Houston, TX', insight:'Driver-focused EV' },
+  { id:47, year:2023, make:'Hyundai', model:'Ioniq 5', trim:'Limited', price:34500, mileage:15000, type:'electric', luxury:false, sport:false, image:'', location:'Austin, TX', insight:'Fast-charging EV' },
+  { id:48, year:2023, make:'Kia', model:'EV6', trim:'Wind', price:33900, mileage:14000, type:'electric', luxury:false, sport:true, image:'', location:'Dallas, TX', insight:'Sporty electric crossover' },
+  { id:49, year:2021, make:'Cadillac', model:'XT5', trim:'Premium Luxury', price:34000, mileage:26000, type:'suv', luxury:true, sport:false, image:'', location:'Houston, TX', insight:'Comfort luxury SUV' },
+  { id:50, year:2022, make:'Infiniti', model:'QX50', trim:'Sensory', price:32500, mileage:23000, type:'suv', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Compact luxury SUV' },
+  { id:51, year:2022, make:'Dodge', model:'Durango', trim:'Citadel', price:42900, mileage:24000, type:'suv', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Three-row Dodge' },
+  { id:52, year:2021, make:'Dodge', model:'Charger', trim:'R/T', price:32900, mileage:28000, type:'sedan', luxury:false, sport:true, image:'', location:'Houston, TX', insight:'Muscle sedan' },
+  { id:53, year:2022, make:'Chevrolet', model:'Tahoe', trim:'High Country', price:54900, mileage:22000, type:'suv', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Full-size Chevy SUV' },
+  { id:54, year:2023, make:'Chevrolet', model:'Equinox', trim:'RS', price:26900, mileage:18000, type:'suv', luxury:false, sport:false, image:'', location:'Dallas, TX', insight:'Compact Chevy SUV' },
+  { id:55, year:2023, make:'Volvo', model:'XC90', trim:'B6', price:46800, mileage:17000, type:'suv', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Three-row Volvo' },
+  { id:56, year:2022, make:'Volvo', model:'S60', trim:'B5', price:32900, mileage:21000, type:'sedan', luxury:true, sport:false, image:'', location:'Houston, TX', insight:'Quiet Volvo sedan' },
+  { id:57, year:2023, make:'Jeep', model:'Grand Cherokee', trim:'Limited', price:41900, mileage:19000, type:'suv', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Family Jeep' },
+  { id:58, year:2022, make:'GMC', model:'Yukon', trim:'Denali', price:58900, mileage:20000, type:'suv', luxury:true, sport:false, image:'', location:'Houston, TX', insight:'Denali luxury SUV' },
+  { id:59, year:2022, make:'Buick', model:'Enclave', trim:'Avenir', price:39900, mileage:23000, type:'suv', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Quiet three-row Buick' },
+  { id:60, year:2022, make:'Chrysler', model:'Pacifica', trim:'Pinnacle', price:34900, mileage:26000, type:'suv', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Family minivan' },
+  { id:61, year:2023, make:'Mazda', model:'CX-5', trim:'Turbo Signature', price:32900, mileage:16000, type:'suv', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Driver-focused Mazda' },
+  { id:62, year:2022, make:'Subaru', model:'Outback', trim:'Touring XT', price:31900, mileage:22000, type:'wagon', luxury:false, sport:false, image:'', location:'Houston, TX', insight:'All-weather wagon' },
+  { id:63, year:2022, make:'Nissan', model:'Armada', trim:'Platinum', price:42900, mileage:24000, type:'suv', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Full-size Nissan' },
+  { id:64, year:2023, make:'Lincoln', model:'Nautilus', trim:'Reserve', price:41900, mileage:15000, type:'suv', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Quiet Lincoln' },
+  { id:65, year:2022, make:'Alfa Romeo', model:'Stelvio', trim:'Ti', price:38900, mileage:18000, type:'suv', luxury:true, sport:true, image:'', location:'Miami, FL', insight:'Sporty Alfa SUV' },
+  { id:66, year:2021, make:'Jaguar', model:'F-Pace', trim:'S', price:39900, mileage:22000, type:'suv', luxury:true, sport:true, image:'', location:'Dallas, TX', insight:'Jaguar performance SUV' },
+  { id:67, year:2022, make:'Maserati', model:'Grecale', trim:'GT', price:52900, mileage:14000, type:'suv', luxury:true, sport:true, image:'', location:'Miami, FL', insight:'Italian luxury SUV' },
+  { id:68, year:2022, make:'Mini', model:'Cooper', trim:'S', price:28900, mileage:17000, type:'wagon', luxury:false, sport:true, image:'', location:'Austin, TX', insight:'Fun compact' },
+  { id:69, year:2023, make:'Mitsubishi', model:'Outlander', trim:'SEL', price:27900, mileage:16000, type:'suv', luxury:false, sport:false, image:'', location:'Houston, TX', insight:'Value three-row' },
+  { id:70, year:2022, make:'Fiat', model:'500X', trim:'Trekking', price:19900, mileage:24000, type:'suv', luxury:false, sport:false, image:'', location:'Dallas, TX', insight:'Small city crossover' },
+  { id:71, year:2022, make:'Lucid', model:'Air', trim:'Touring', price:62900, mileage:9000, type:'electric', luxury:true, sport:true, image:'', location:'Austin, TX', insight:'Faster Lucid Air' },
+  { id:72, year:2023, make:'VinFast', model:'VF 8', trim:'Plus', price:32900, mileage:12000, type:'electric', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Electric crossover' },
+  { id:73, year:2022, make:'Ineos', model:'Grenadier', trim:'Fieldmaster', price:68900, mileage:11000, type:'suv', luxury:true, sport:false, image:'', location:'Austin, TX', insight:'Off-road luxury' },
+  { id:74, year:2021, make:'Bentley', model:'Bentayga', trim:'V8', price:129000, mileage:18000, type:'suv', luxury:true, sport:false, image:'', location:'Miami, FL', insight:'Ultra-luxury SUV' },
+  { id:75, year:2021, make:'Aston Martin', model:'DBX', trim:'V8', price:119000, mileage:14000, type:'suv', luxury:true, sport:true, image:'', location:'Dallas, TX', insight:'Aston SUV' },
+  { id:76, year:2020, make:'Ferrari', model:'Roma', trim:'Coupe', price:149000, mileage:8000, type:'sports', luxury:true, sport:true, image:'', location:'Miami, FL', insight:'Grand tourer' },
+  { id:77, year:2021, make:'Lamborghini', model:'Urus', trim:'Base', price:149000, mileage:16000, type:'suv', luxury:true, sport:true, image:'', location:'Houston, TX', insight:'Super SUV' },
+  { id:78, year:2020, make:'Rolls-Royce', model:'Ghost', trim:'Base', price:149000, mileage:12000, type:'sedan', luxury:true, sport:false, image:'', location:'Dallas, TX', insight:'Flagship luxury sedan' },
+  { id:79, year:2021, make:'McLaren', model:'GT', trim:'Base', price:145000, mileage:7000, type:'sports', luxury:true, sport:true, image:'', location:'Austin, TX', insight:'Grand touring McLaren' },
+  { id:80, year:2023, make:'Lotus', model:'Emira', trim:'First Edition', price:89000, mileage:4000, type:'sports', luxury:true, sport:true, image:'', location:'Miami, FL', insight:'Mid-engine Lotus' }
+];
+
+let budget = 45000, offset = 0, ranked = [];
+let shortlist = JSON.parse(localStorage.getItem('dealwheel_shortlist') || '[]');
+
+function diversify(listings) {
+  // Group by make+model, pick the best deal in each group
+  const groups = {};
+  for (const c of listings) {
+    const key = ((c.make || '') + '|' + (c.model || '')).toLowerCase();
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(c);
+  }
+  const best = [];
+  for (const key in groups) {
+    const arr = groups[key];
+    // Best = lowest price relative to year and miles (prefer newer, lower miles, lower price)
+    arr.sort((a, b) => {
+      const scoreA = (a.price || 999999) + (a.mileage || 0) * 0.15 - (a.year || 2020) * 200;
+      const scoreB = (b.price || 999999) + (b.mileage || 0) * 0.15 - (b.year || 2020) * 200;
+      return scoreA - scoreB;
+    });
+    best.push(arr[0]);
+  }
+  // Sort best deals by how close they are to budget
+  best.sort((a, b) => {
+    const ra = (a.price || 0) / (budget || 45000);
+    const rb = (b.price || 0) / (budget || 45000);
+    // Prefer 75-108% of budget
+    const sa = (ra >= 0.75 && ra <= 1.08) ? 0 : Math.abs(ra - 0.9);
+    const sb = (rb >= 0.75 && rb <= 1.08) ? 0 : Math.abs(rb - 0.9);
+    return sa - sb;
+  });
+  return best.slice(0, 9);
+}
+
+function saveCar(id) {
+  const c = ranked.find(x => x.id === id);
+  if (!c) return;
+  if (shortlist.some(s => s.id === id || (s.vin && s.vin === c.vin))) {
+    alert('Already in your shortlist');
+    return;
+  }
+  if (shortlist.length >= 4) {
+    alert('Shortlist is full (max 4). Remove one to add more.');
+    return;
+  }
+  shortlist.push({ id: c.id, vin: c.vin, year: c.year, make: c.make, model: c.model, trim: c.trim, price: c.price, image: c.image, vdp: c.vdp, location: c.location });
+  localStorage.setItem('dealwheel_shortlist', JSON.stringify(shortlist));
+  renderShortlist();
+}
+
+function removeSaved(id) {
+  shortlist = shortlist.filter(s => s.id !== id);
+  localStorage.setItem('dealwheel_shortlist', JSON.stringify(shortlist));
+  renderShortlist();
+}
+
+function renderShortlist() {
+  const btn = document.getElementById('shortlistToggle');
+  if (btn) btn.textContent = `♡ Shortlist (${shortlist.length})`;
+  const el = document.getElementById('shortlistContent');
+  if (!el) return;
+  if (!shortlist.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem">No cars saved yet. Tap ♡ on a recommendation.</div>';
+    return;
+  }
+  el.innerHTML = shortlist.map(s => `
+    <div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid var(--border)">
+      ${s.image ? `<img src="${s.image}" style="width:60px;height:40px;object-fit:cover;border-radius:4px">` : ''}
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:0.9rem">${s.year} ${s.make} ${s.model}</div>
+        <div style="font-size:0.75rem;color:var(--muted)">$${(s.price||0).toLocaleString()} • ${s.location || ''}</div>
+      </div>
+      <button onclick="removeSaved(${s.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem">×</button>
+    </div>
+  `).join('');
+}
+
+
+const budgetEl = document.getElementById('budget');
+const display = document.getElementById('budgetDisplay');
+function updateBudget() {
+  if (!budgetEl || !display) return;
+  budget = +budgetEl.value;
+  display.textContent = '$' + budget.toLocaleString();
+}
+if (budgetEl) {
+  budgetEl.addEventListener('input', updateBudget);
+  budgetEl.addEventListener('change', updateBudget);
+  updateBudget();
+}
+
+if (document.getElementById('parseBtn')) document.getElementById('parseBtn').onclick = () => {
+  const t = document.getElementById('nl').value.toLowerCase();
+  const m = t.match(/under\s*\$?(\d+)[k]?|\$(\d+)[k]?/);
+  if (m) { let n = +(m[1]||m[2]); if (t.includes('k')||n<200) n*=1000; budgetEl.value = Math.min(150000,Math.max(15000,n)); updateBudget(); }
+  if (t.includes('sport')) document.getElementById('sport').checked = true;
+  if (t.includes('suv')) document.getElementById('carType').value = 'suv';
+  if (t.includes('bmw')) {
+    document.querySelectorAll('.brand-pick').forEach(el => { el.checked = el.value === 'BMW'; });
+    document.querySelectorAll('.brand-pick-2').forEach(el => { el.checked = el.value === 'BMW'; });
+    if (typeof paintBrandLabels === 'function') paintBrandLabels();
+  }
+};
+
+const WANT_LABELS = {
+  reliable: 'Reliable',
+  family: 'Room for family',
+  sporty: 'Sporty',
+  lowmiles: 'Low miles',
+  awd: 'All-wheel drive',
+  electric: 'Electric',
+  comfort: 'Comfortable',
+  luxury: 'Luxury feel',
+  cheap: 'Easier to own'
+};
+function readWants(text) {
+  const t = (text || '').toLowerCase();
+  const wants = [];
+  if (/reliab|dependab|last a long|low maintenance/.test(t)) wants.push('reliable');
+  if (/kid|family|third row|3rd row|car seat|room for|passenger|cargo|van/.test(t)) wants.push('family');
+  if (/sport|fun to drive|fast|performance|quick/.test(t)) wants.push('sporty');
+  if (/low mile|few miles|lightly used/.test(t)) wants.push('lowmiles');
+  if (/awd|all[- ]wheel|snow|4x4|4wd/.test(t)) wants.push('awd');
+  if (/\belectric\b|\bev\b|hybrid|plug-in/.test(t)) wants.push('electric');
+  if (/quiet|comfort|smooth ride|smooth/.test(t)) wants.push('comfort');
+  if (/luxury|premium|upscale|nice interior/.test(t)) wants.push('luxury');
+  if (/afford|cheap|value|econom|easy to own/.test(t)) wants.push('cheap');
+  return wants;
+}
+function carTraits(c) {
+  const s = new Set();
+  const make = (c.make || '').toLowerCase();
+  const blob = ((c.make || '') + ' ' + (c.model || '') + ' ' + (c.trim || '') + ' ' + (c.type || '')).toLowerCase();
+  if (/toyota|honda|lexus|mazda|acura|subaru|volvo/.test(make)) s.add('reliable');
+  if (/suv|truck|wagon/.test(c.type || '') || /pilot|tahoe|durango|x7|mdx|pacifica|yukon|outback|grand cherokee|enclave|armada|xc90/.test(blob)) s.add('family');
+  if (c.sport || c.type === 'sports' || c.type === 'convertible') s.add('sporty');
+  if ((c.mileage || 999999) <= 18000) s.add('lowmiles');
+  if (c.type === 'suv' || c.type === 'truck' || /awd|4matic|xdrive|quattro|4wd/.test(blob)) s.add('awd');
+  if (c.type === 'electric') s.add('electric');
+  if (c.luxury) { s.add('comfort'); s.add('luxury'); }
+  if (!c.luxury || /toyota|honda|mazda|hyundai|kia|subaru|chevrolet|ford/.test(make)) s.add('cheap');
+  return s;
+}
+function matchLabels(c) {
+  const wants = window._wants || [];
+  const traits = carTraits(c);
+  return wants.filter(w => traits.has(w)).map(w => WANT_LABELS[w] || w);
+}
+
+function rank(budget, prefs) {
+  const minYear = +prefs.minYear || 2010;
+  const maxYear = +prefs.maxYear || 2026;
+  const brands = Array.isArray(prefs.brand) ? prefs.brand.map(b => String(b).toLowerCase()).filter(b => b && b !== 'all') : ((prefs.brand || '').toLowerCase().trim() ? [(prefs.brand || '').toLowerCase().trim()] : []);
+  const allBrands = brands.length === 0;
+  const carTypes = prefs.carTypes || [];
+  const allTypes = carTypes.includes('all') || carTypes.length === 0;
+  const wantLuxury = prefs.luxury;
+  const wantSport = prefs.sport;
+  const considering = (prefs.considering || '').toLowerCase();
+
+  let inferredType = null;
+  if (considering.includes('macan') || considering.includes('suv') || considering.includes('crossover')) inferredType = 'suv';
+  else if (considering.includes('sedan') || considering.includes('accord') || considering.includes('camry')) inferredType = 'sedan';
+  else if (considering.includes('sport') || considering.includes('coupe')) inferredType = 'sports';
+  else if (considering.includes('electric') || considering.includes('rivian') || considering.includes('lucid') || considering.includes('tesla')) inferredType = 'electric';
+
+  const maxMiles = +prefs.maxMiles || 999999;
+  const passes = (c, relaxed) => {
+    if (c.year < minYear || c.year > maxYear) return false;
+    if (c.price > budget) return false;
+    if (!relaxed && c.price < budget * 0.55) return false;
+    if (!relaxed && (c.mileage || 0) > maxMiles) return false;
+    if (!relaxed && !allBrands && !brands.some(b => (c.make || '').toLowerCase().includes(b))) return false;
+    if (!relaxed && !allTypes) {
+      const matches = carTypes.some(t => t === c.type || (t === 'luxury' && c.luxury) || (t === 'electric' && c.type === 'electric'));
+      if (!matches) return false;
+    }
+    if (!relaxed && wantLuxury && !c.luxury && allBrands) return false;
+    if (!relaxed && wantSport && !c.sport && allBrands) return false;
+    return true;
+  };
+  let filtered = MOCK.filter(c => passes(c, false));
+  if (!filtered.length) filtered = MOCK.filter(c => passes(c, true));
+  if (!filtered.length) filtered = MOCK.filter(c => c.price <= budget && c.year >= minYear && c.year <= maxYear);
+
+  return filtered.map(c => {
+    const ratio = c.price / budget;
+    let score = Math.round(100 - Math.abs(0.92 - ratio) * 140);
+    if (inferredType && c.type === inferredType) score += 40;
+    else if (!inferredType && !allTypes && carTypes.includes(c.type)) score += 30;
+    if (c.mileage < 25000) score += 10;
+    if (c.luxury) score += 12;
+    if (wantSport && c.sport) score += 10;
+    if (!allBrands && brands.some(b => (c.make || '').toLowerCase().includes(b))) score += 25;
+    (prefs.wants || []).forEach(w => { if (carTraits(c).has(w)) score += 16; });
+    if (/macan|gv70|x3|q5|glc|rivian|lucid/.test((c.model || '').toLowerCase()) && ratio >= 0.7) score += 8;
+    return { ...c, score };
+  }).sort((a, b) => b.score - a.score);
+}
+
+function showStep(n) {
+  document.getElementById('step1').classList.toggle('hidden', n!==1);
+  document.getElementById('step2').classList.toggle('hidden', n!==2);
+  document.getElementById('step3').classList.toggle('hidden', n!==3);
+  ['s1','s2','s3'].forEach((id,i) => document.getElementById(id).classList.toggle('active', i+1===n));
+  const sticky = document.getElementById('stickyCta');
+  if (sticky) sticky.classList.add('hidden');
+  if (n === 3) {
+    const modal = document.getElementById('inquiryModal');
+    if (modal) modal.style.display = 'none';
+  }
+  if (n === 2) renderDeck();
+}
+
+
+// Image verification: ensure photo matches make/model
+
+const MODEL_IMAGES = {
+  'bmw x3': 'https://hips.hearstapps.com/mtg-prod/65c32f57db90fc0008bda9f5/2020-bmw-x3m-competition-front-three-quarter-in-motion-1.jpg',
+  'bmw x5': 'https://di-enrollment-api.s3.amazonaws.com/bmw/discover-pages/2024/x5/x5-sdrive40i-%26-x5-xdrive40i.jpg',
+  'bmw x7': 'https://di-enrollment-api.s3.amazonaws.com/bmw/discover-pages/2024/x5/x5-sdrive40i-%26-x5-xdrive40i.jpg',
+  'bmw 3 series': 'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg',
+  'bmw 5 series': 'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg',
+  'bmw 4 series': 'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg',
+  'audi a4': 'https://stimg.cardekho.com/images/carexteriorimages/630x420/Audi/A4/8223/1659949870180/front-left-side-47.jpg',
+  'audi q5': 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Audi_Q5_2.0_TDI_quattro_S_line_%28GU%29_%E2%80%93_f_13102025.jpg',
+  'mercedes-benz c-class': 'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg',
+  'mercedes-benz e-class': 'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg',
+  'mercedes-benz s-class': 'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg',
+  'mercedes-benz glc': 'https://dealerinspire-image-library-prod.s3.us-east-1.amazonaws.com/images/qX42MjIcDnXNHmUJWKoJYMg2glkHkFRJmBSRvMoF.png',
+  'mercedes-benz gle': 'https://dealerinspire-image-library-prod.s3.us-east-1.amazonaws.com/images/qX42MjIcDnXNHmUJWKoJYMg2glkHkFRJmBSRvMoF.png',
+  'porsche macan': 'https://pictures.porsche.com/rtt/iris?COSY-EU-100-1711coMvsi60AAt5FwcmBEgA4qP8iBUDxPE3Cb9pNXuBuNXdMGF4tl3U0%25z8rMHIspbWvanYb%255y%25oq%25vSTmjMXD4qAZeoNBPUSfUx4RmHlCgI7ZB4x7e2HtpQDcFGImVYnfur3165yPew9H2CvNzx4JzGXoq1XuUr6FOb6dHwRuT0RCTx7e2H3t41UzQKTBObsqYS2Lh0iO5M7ZNHcTCkiNDKf2GLumr6FOb34wwRuT0tGmx7e2HLWJ1UzQKINybsqYS5wI0iO5MP4hHcTCkNO6KfyUxFkprU9pNfWKapxdMG0VPni2uFcL%25',
+  'porsche cayenne': 'https://newsroom.porsche.com/.imaging/mte/porsche-templating-theme/image_1290x726/dam/US-local/Press-Releases/2023/Cayenne_S_E-Hybrid/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg/jcr:content/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg',
+  'porsche 911': 'https://media.wired.com/photos/5d8e7990cac1be000849ccd9/4:3/w_1776,h_1332,c_limit/Transpo_Taycan-Turbo_Taycan-Turbo-S-(6).jpg',
+  'honda accord': 'https://www.honda.com/content/dam/honda/na/us/english/vehicles/accord/accord-sedan/2023/exterior/2023-accord-sport-still-night-pearl.jpg',
+  'toyota rav4': 'https://hips.hearstapps.com/autoweek/assets/s3fs-public/2019_lexus_es_front_1_0.jpg?resize=980:*',
+  'tesla model 3': 'https://hips.hearstapps.com/hmg-prod/images/2026-tesla-model-3-standard-120-68e3fb1f4d3ec.jpg',
+  'tesla model y': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Tesla_Model_Y_Premium_%28Facelift%29_%E2%80%93_f_05052026.jpg',
+  'land rover range rover sport': 'https://www.rangerover.com/content/dam/lrdx/global/l461/25my/int/L46125GL_303104068_THE_SPY_003_DX.jpg.res/JLRHASH28B3D8817AC09B43F4017D234BCC2D402C716031/L46125GL_303104068_THE_SPY_003_DX.jpg'
+};
+
+const IMAGE_FALLBACKS = {
+  'bmw': 'https://static.cargurus.com/images/site/2021/04/20/14/59/2021_bmw_3_series-pic-11901113463384733522-1600x1200.jpeg',
+  'audi': 'https://stimg.cardekho.com/images/carexteriorimages/630x420/Audi/A4/8223/1659949870180/front-left-side-47.jpg',
+  'mercedes': 'https://www.mbusa.com/content/dam/mb-nafta/us/myco/my26/c-class/class-page/series-ncm/2026-C-SEDAN-HC-D.jpg',
+  'porsche': 'https://newsroom.porsche.com/.imaging/mte/porsche-templating-theme/image_1290x726/dam/US-local/Press-Releases/2023/Cayenne_S_E-Hybrid/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg/jcr:content/1114_miami_s_ucrane_akos4359_5032_v03_final_crop.jpg',
+  'ram': 'https://di-uploads-pod12.dealerinspire.com/universitydodgeram/uploads/2022/09/UDodge-Ram-1500-Limited-Elite.jpg',
+  'honda': 'https://www.honda.com/content/dam/honda/na/us/english/vehicles/accord/accord-sedan/2023/exterior/2023-accord-sport-still-night-pearl.jpg',
+  'toyota': 'https://hips.hearstapps.com/autoweek/assets/s3fs-public/2019_lexus_es_front_1_0.jpg?resize=980:*',
+  'tesla': 'https://hips.hearstapps.com/hmg-prod/images/2026-tesla-model-3-standard-120-68e3fb1f4d3ec.jpg',
+  'land rover': 'https://www.rangerover.com/content/dam/lrdx/global/l461/25my/int/L46125GL_303104068_THE_SPY_003_DX.jpg.res/JLRHASH28B3D8817AC09B43F4017D234BCC2D402C716031/L46125GL_303104068_THE_SPY_003_DX.jpg'
+};
+
+function photoUrl(make, model, year) {
+  return '/api/car-image?make=' + encodeURIComponent(make || '') + '&model=' + encodeURIComponent(model || '') + '&year=' + encodeURIComponent(year || '');
+}
+
+function verifyImage(make, model, url, year) {
+  return photoUrl(make, model, year);
+}
+
+
+const _imageCache = {};
+async function fetchCarImage(make, model, year) {
+  const key = (year + ' ' + make + ' ' + model).toLowerCase();
+  if (_imageCache[key]) return _imageCache[key];
+  const q = encodeURIComponent(year + ' ' + make + ' ' + model + ' car');
+  try {
+    // DuckDuckGo image search
+    const tokenRes = await fetch('https://duckduckgo.com/?q=' + q + '&iax=images&ia=images', { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const html = await tokenRes.text();
+    const vqd = (html.match(/vqd=["']?([\d-]+)/) || [])[1];
+    if (vqd) {
+      const imgRes = await fetch('https://duckduckgo.com/i.js?l=us-en&o=json&q=' + q + '&vqd=' + vqd + '&f=,,,,,&p=1');
+      const imgData = await imgRes.json();
+      const url = imgData.results?.[0]?.image || imgData.results?.[0]?.thumbnail;
+      if (url) {
+        _imageCache[key] = url;
+        return url;
+      }
+    }
+  } catch (e) {}
+  return getFallback(make, model);
+}
+
+function getFallback(make, model) {
+  const key = ((make || '') + ' ' + (model || '')).toLowerCase().trim();
+  if (MODEL_IMAGES[key]) return MODEL_IMAGES[key];
+  const m = (make || '').toLowerCase();
+  for (const [k, fallback] of Object.entries(IMAGE_FALLBACKS)) {
+    if (m.includes(k)) return fallback;
+  }
+  const label = ((make || '') + ' ' + (model || '')).replace(/[<>&"]/g, '');
+  return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect fill="#e8eef5" width="100%" height="100%"/><text x="50%" y="50%" fill="#5c6b7a" font-family="sans-serif" font-size="28" text-anchor="middle">' + label + '</text></svg>');
+}
+
+
+function estMaintenance(c) {
+  const year = c.year || 2022;
+  const age = Math.max(0, 2026 - year);
+  const miles = c.mileage || 20000;
+  const make = (c.make || '').toLowerCase();
+  const type = (c.type || '').toLowerCase();
+
+  // Routine service, not a repair fund. Luxury is higher, but not dealer-sticker high.
+  let base = 220;
+  if (/ferrari|lamborghini|bentley|rolls/.test(make)) base = 650;
+  else if (/porsche|maserati/.test(make)) base = 420;
+  else if (/land rover|jaguar/.test(make)) base = 360;
+  else if (/bmw|mercedes|audi|genesis|lexus|cadillac|volvo|lincoln|infiniti|acura/.test(make)) base = 290;
+  else if (/tesla|rivian|lucid|polestar/.test(make)) base = 180;
+  else if (/toyota|honda|mazda|subaru|hyundai|kia/.test(make)) base = 200;
+
+  base += age * 8;
+  base += Math.min(40, Math.round(miles / 1000));
+  if (type === 'suv' || type === 'truck') base += 15;
+  if (type === 'sports' || type === 'convertible') base += 20;
+  if (type === 'electric') base = Math.round(base * 0.9);
+
+  const vary = (((c.id || 1).toString().charCodeAt(0) || 0) % 5 - 2) * 10;
+  return Math.max(240, Math.round(base + vary));
+}
+
+
+function ownershipParts(c) {
+  const payment = Math.round((c.price || 0) * 0.018 * 12);
+  const maint = estMaintenance(c);
+  const insurance = Math.round((c.price || 30000) * 0.012 + (c.luxury ? 400 : 200));
+  const fuel = (c.type === 'electric') ? 600 : 1400;
+  return { payment, maint, insurance, fuel, total: payment + maint + insurance + fuel };
+}
+function yearlyOwnership(c) {
+  return ownershipParts(c).total;
+}
+
+function consideredCar() {
+  const text = (window._considering || '').toLowerCase();
+  let price = budget || 45000;
+  if (text.includes('macan') || text.includes('x3') || text.includes('glc')) price = Math.max(price, 55000);
+  if (text.includes('accord') || text.includes('camry') || text.includes('rav4')) price = Math.min(price, 35000);
+  return { price, year: 2025, mileage: 0, make: text.split(' ')[1] || text.split(' ')[0] || '', type: 'suv', luxury: /bmw|mercedes|audi|porsche|lexus/.test(text) };
+}
+function baselineOwnership() {
+  return yearlyOwnership(consideredCar());
+}
+
+
+let _filterTimer = null;
+function filterTab2() {
+  const b = +document.getElementById('tab2Budget').value || budget || 45000;
+  const t = (document.getElementById('tab2Type').value || 'all').toLowerCase();
+  const similar = document.getElementById('tab2Similar')?.checked;
+  const milesCap = +(document.getElementById('tab2Miles')?.value || 999999) || 999999;
+  const pageMiles = document.getElementById('maxMiles');
+  if (pageMiles && document.getElementById('tab2Miles')) pageMiles.value = String(milesCap);
+  const display = document.getElementById('tab2BudgetDisplay');
+  if (display) display.textContent = '$' + b.toLocaleString();
+  clearTimeout(_filterTimer);
+  _filterTimer = setTimeout(() => {
+    budget = b;
+    const prefs = {
+      minYear: document.getElementById('minYear')?.value || 2018,
+      maxYear: 2026,
+      brand: chosenBrands(),
+      carTypes: t === 'all' ? ['all'] : [t],
+      luxury: document.getElementById('luxury')?.checked || false,
+      sport: document.getElementById('sport')?.checked || false,
+      reliability: true,
+      considering: window._considering || '',
+      maxMiles: milesCap,
+      wants: window._wants || []
+    };
+    let results = rank(budget, prefs);
+    if (t !== 'all') {
+      const similarMap = { suv: ['suv','crossover','wagon'], sedan: ['sedan','wagon'], sports: ['sports','convertible','coupe'], truck: ['truck','suv'], electric: ['electric'], wagon: ['wagon','suv','sedan'], convertible: ['convertible','sports'] };
+      const allowed = similar ? (similarMap[t] || [t]) : [t];
+      const typed = results.filter(c => allowed.includes((c.type || '').toLowerCase()));
+      if (typed.length) results = typed;
+    }
+    ranked = results;
+    window._deckList = results;
+    window._tab2Filtered = results;
+    offset = 0;
+    renderDeck(true);
+  }, 200);
+}
+
+
+function skeletonCards(n) {
+  return Array.from({length:n}, () => `
+    <div class="rec-card">
+      <div class="skel" style="height:180px;border-radius:0"></div>
+      <div class="c">
+        <div class="skel" style="height:18px;width:70%;margin-bottom:8px"></div>
+        <div class="skel" style="height:14px;width:40%;margin-bottom:10px"></div>
+        <div class="skel" style="height:22px;width:35%"></div>
+      </div>
+    </div>`).join('');
+}
+async function upgradeImages() {
+  document.querySelectorAll('img[data-make]').forEach(async (img) => {
+    const make = img.dataset.make;
+    const model = img.dataset.model;
+    const year = img.dataset.year;
+    const better = await fetchCarImage(make, model, year);
+    if (better && /^https?:/i.test(better) && !better.includes('placeholder') && better !== img.src && !String(img.src).includes('/api/car-image')) img.src = better;
+  });
+}
+function renderDeck(fromFilter) {
+  renderShortlist();
+  const list = window._deckList || ranked;
+  const slice = list.slice(offset, offset + 3);
+  updateLotButtons();
+  const label = (window._considering || '').trim();
+  const instead = label && label.toLowerCase() !== 'a new car' ? label : 'your search';
+  document.getElementById('deckNote').textContent = `Instead of ${instead} • Budget $${budget.toLocaleString()} • ${list.length} options`;
+  document.getElementById('deckTitle').textContent = label && label.toLowerCase() !== 'a new car' ? `Instead of ${label}` : 'Better cars in your budget';
+  if (!slice.length) {
+    document.getElementById('deck').innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No cars at or under this budget. Raise the budget or clear a filter.</div>';
+    updateLotButtons();
+    return;
+  }
+  const target = (window._considering || '').trim();
+  const compared = target && target.toLowerCase() !== 'a new car' ? target : 'a basic new car';
+  document.getElementById('deck').innerHTML = slice.map((c, i) => {
+    const isTop = i === 0 && offset === 0;
+    const upgradeBadge = c.luxury ? 'Premium upgrade' : (c.price >= budget * 0.85 ? 'Best match' : 'Value');
+    const left = Math.max(0, budget - c.price);
+    const pay = Math.round(c.price * 0.018);
+    const own = yearlyOwnership(c);
+    const baseOwn = baselineOwnership();
+    const delta = baseOwn - own;
+    const vs = delta > 200
+      ? `About $${delta.toLocaleString()} less a year to own than a new ${compared}.`
+      : delta < -200
+        ? `About $${Math.abs(delta).toLocaleString()} more a year to own, for a stronger car than a new ${compared}.`
+        : `Yearly cost is close to a new ${compared}, with more car for the price.`;
+    const chips = matchLabels(c).map(m => `<span>${m}</span>`).join('');
+    return `
+    <div class="rec-card" style="${isTop ? 'border:2px solid var(--accent);grid-column:span 1' : ''}">
+      ${isTop ? '<div style="background:var(--accent);color:#fff;font-size:0.7rem;padding:0.25rem 0.5rem;text-align:center">Top upgrade for you</div>' : ''}
+      <img loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" src="${verifyImage(c.make, c.model, c.image, c.year)}" onerror="this.onerror=null;this.src=getFallback('${c.make}','${c.model}')" data-make="${c.make}" data-model="${c.model}" data-year="${c.year}" alt="${c.year} ${c.make} ${c.model}">
+      <div class="c">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <h3>${c.year} ${c.make} ${c.model}</h3>
+          <span class="badge" style="background:${c.luxury ? '#e7f6ee' : ''};color:${c.luxury ? 'var(--success)' : ''}">${upgradeBadge}</span>
+        </div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-bottom:0.3rem">${c.trim}</div>
+        <div class="price">$${c.price.toLocaleString()}</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin:0.2rem 0">${c.mileage.toLocaleString()} mi</div>
+        <div class="insight">
+          <div class="deal-kicker">Why this instead</div>
+          <div>$${left.toLocaleString()} left in your $${budget.toLocaleString()} budget.</div>
+          <p class="deal-sub">${vs}</p>
+          <div class="deal-metrics">
+            <div><b>$${pay.toLocaleString()}</b><span>per month</span></div>
+            <div><b>$${estMaintenance(c).toLocaleString()}</b><span>upkeep / yr</span></div>
+            <div><b>$${own.toLocaleString()}</b><span>to own / yr</span></div>
+          </div>
+          ${chips ? `<div class="chips">${chips}</div>` : ''}
+        </div>
+        <div class="card-actions">
+          <button class="btn" type="button" onclick="event.stopPropagation(); askOnPage2(${c.id}, event)">Check availability</button>
+          <button class="btn btn-secondary" type="button" onclick="event.stopPropagation(); showDetail(${c.id})">Details</button>
+          <button class="btn btn-secondary" onclick="saveCar(${c.id})" title="Save">♡ Save</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  setTimeout(upgradeImages, 100);
+}
+
+
+document.querySelectorAll('.car-type').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (cb.value === 'all' && cb.checked) {
+      document.querySelectorAll('.car-type').forEach(o => { if (o.value !== 'all') o.checked = false; });
+    } else if (cb.value !== 'all' && cb.checked) {
+      const all = document.querySelector('.car-type[value="all"]');
+      if (all) all.checked = false;
+    }
+  });
+});
+
+if (document.getElementById('carTypeToggle')) document.getElementById('carTypeToggle').onclick = () => {
+  const menu = document.getElementById('carTypeMenu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+};
+const carTypeDropdown = document.getElementById('carTypeDropdown');
+if (carTypeDropdown) document.addEventListener('click', (e) => {
+  if (!carTypeDropdown.contains(e.target)) {
+    const menu = document.getElementById('carTypeMenu');
+    if (menu) menu.style.display = 'none';
+  }
+});
+function updateCarTypeLabel() {
+  const checked = Array.from(document.querySelectorAll('.car-type:checked')).map(el => el.value);
+  const label = document.getElementById('carTypeLabel');
+  if (checked.includes('all') || checked.length === 0) label.textContent = 'All';
+  else if (checked.length === 1) label.textContent = checked[0].charAt(0).toUpperCase() + checked[0].slice(1);
+  else label.textContent = checked.length + ' types selected';
+}
+document.querySelectorAll('.car-type').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (cb.value === 'all' && cb.checked) {
+      document.querySelectorAll('.car-type').forEach(o => { if (o.value !== 'all') o.checked = false; });
+    } else if (cb.value !== 'all' && cb.checked) {
+      const all = document.querySelector('.car-type[value="all"]');
+      if (all) all.checked = false;
+    }
+    updateCarTypeLabel();
+  });
+});
+
+document.getElementById('parseSmart').onclick = () => {
+  document.getElementById('findBtn').click();
+};
+
+async function pullListings(car, distance, useZip) {
+  const zip = document.getElementById('zip').value || '';
+  const params = new URLSearchParams({
+    'vehicle.make': car.make,
+    'vehicle.model': car.model,
+    'vehicle.year': (car.year - 1) + '-' + (car.year + 1),
+    'retailListing.price': '0-' + Math.round((car.price || budget) * 1.2),
+    'retailListing.miles': '0-50000'
+  });
+  if (useZip && zip) {
+    params.set('zip', zip);
+    params.set('distance', String(distance));
+  }
+  const res = await fetch('/api/listings?' + params.toString());
+  const data = await res.json();
+  if (!res.ok || data.mock || data.error) return null;
+  return (data.data || data.listings || data.records || []).slice(0, 7).map((item) => {
+    const v = item.vehicle || item;
+    const r = item.retailListing || item;
+    return {
+      price: r.price || 0,
+      mileage: r.miles || 0,
+      image: (r.primaryImage || '').replace('http:', 'https:'),
+      location: (r.city && r.state) ? r.city + ', ' + r.state : 'Farther away',
+      dealer: r.dealer || '',
+      vdp: r.vdp || '',
+      vin: v.vin
+    };
+  }).filter(x => x.price > 0);
+}
+
+async function keepWorkingLinks(listings) {
+  const urls = [...new Set(listings.map(l => l.vdp).filter(u => /^https:\/\//i.test(u)))];
+  if (!urls.length) return listings.map(l => ({ ...l, vdp: '' }));
+  try {
+    const res = await fetch('/api/check-links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ urls })
+    });
+    const data = await res.json();
+    const ok = new Set((data.results || []).filter(r => r.ok).map(r => r.url));
+    return listings.map(l => ({ ...l, vdp: ok.has(l.vdp) ? l.vdp : '' }));
+  } catch {
+    return listings.map(l => ({ ...l, vdp: '' }));
+  }
+}
+
+async function fetchLiveForCar(car) {
+  try {
+    let listings = await pullListings(car, 100, true);
+    if (listings === null) return null;
+    let outsideArea = false;
+    if (!listings.length) {
+      listings = await pullListings(car, 500, true);
+      outsideArea = true;
+    }
+    if (!listings || !listings.length) return { listings: [], outsideArea: true };
+    listings = await keepWorkingLinks(listings);
+    return { listings, outsideArea };
+  } catch (e) {
+    return null;
+  }
+}
+
+async function fetchLiveListings(budget, prefs, distance = 50) {
+  const zip = document.getElementById('zip').value || '78701';
+  const params = new URLSearchParams({
+    zip,
+    distance: String(distance),
+    'retailListing.price': `0-${Math.round(budget * 1.15)}`,
+    'vehicle.year': `${prefs.minYear || 2018}-${prefs.maxYear || 2026}`,
+    'retailListing.miles': '0-40000'
+  });
+  const liveBrands = Array.isArray(prefs.brand) ? prefs.brand.filter(b => b && b !== 'all') : (prefs.brand ? [prefs.brand] : []);
+  if (liveBrands.length === 1) params.set('vehicle.make', liveBrands[0]);
+  try {
+    const res = await fetch('/api/listings?' + params.toString());
+    const data = await res.json();
+    if (!res.ok || data.mock || data.fallback || data.error) {
+      console.warn('Auto.dev unavailable:', data);
+      return null;
+    }
+    const listings = (data.data || data.listings || data.records || []).slice(0, 40);
+    if (!listings.length && distance === 50) {
+      return fetchLiveListings(budget, prefs, 100);
+    }
+    return listings.map((item, i) => {
+      const v = item.vehicle || item;
+      const r = item.retailListing || item;
+      return {
+        id: i + 100,
+        year: v.year || 2022,
+        make: v.make || 'Unknown',
+        model: v.model || '',
+        trim: v.trim || '',
+        price: r.price || r.listPrice || 0,
+        mileage: r.miles || r.mileage || 0,
+        type: (v.bodyStyle || 'suv').toLowerCase(),
+        luxury: true,
+        sport: false,
+        image: (r.primaryImage || r.images?.[0]?.url || r.images?.[0] || '').toString().replace('http:', 'https:') || photoUrl(v.make, v.model, v.year),
+        location: (r.city && r.state) ? `${r.city}, ${r.state}` : (r.dealer?.city ? `${r.dealer.city}, ${r.dealer.state}` : 'US'),
+        dealer: r.dealer || r.dealerName || '',
+        vdp: r.vdp || '',
+        carfaxUrl: r.carfaxUrl || '',
+        insight: 'Live from Auto.dev',
+        vin: v.vin,
+        isLive: true
+      };
+    }).filter(c => c.price > 0);
+  } catch (e) {
+    console.warn('Live API failed, using demo data', e);
+    return null;
+  }
+}
+
+function updateLotButtons() {
+  const list = window._deckList || ranked;
+  const prev = document.getElementById('prevLot');
+  const next = document.getElementById('nextLot');
+  if (prev) prev.disabled = offset <= 0;
+  if (next) next.disabled = offset + 3 >= list.length;
+}
+function page1Prefs() {
+  return {
+    minYear: document.getElementById('minYear').value,
+    maxYear: document.getElementById('maxYear') ? document.getElementById('maxYear').value : 2026,
+    brand: chosenBrands(),
+    carTypes: Array.from(document.querySelectorAll('.car-type:checked')).map(el => el.value),
+    luxury: document.getElementById('luxury').checked,
+    sport: document.getElementById('sport').checked,
+    reliability: document.getElementById('reliability').checked,
+    considering: document.getElementById('considering').value,
+    maxMiles: document.getElementById('maxMiles') ? document.getElementById('maxMiles').value : 999999,
+    wants: readWants(document.getElementById('smartInput') ? document.getElementById('smartInput').value : '')
+  };
+}
+function applySearch() {
+  window._considering = document.getElementById('considering').value || '';
+  window._wants = readWants(document.getElementById('smartInput') ? document.getElementById('smartInput').value : '');
+  budget = +budgetEl.value;
+  ranked = rank(budget, page1Prefs());
+  window._deckList = ranked;
+  offset = 0;
+  const t2 = document.getElementById('tab2Budget');
+  if (t2) {
+    t2.value = budget;
+    document.getElementById('tab2BudgetDisplay').textContent = '$' + budget.toLocaleString();
+  }
+  const types = page1Prefs().carTypes.filter(t => t !== 'all' && t !== 'luxury');
+  const milesEl = document.getElementById('maxMiles');
+  const miles2 = document.getElementById('tab2Miles');
+  if (milesEl && miles2) miles2.value = milesEl.value;
+  const typeEl = document.getElementById('tab2Type');
+  if (typeEl) typeEl.value = types.length === 1 ? types[0] : 'all';
+  window._searched = true;
+}
+function goStep(n) {
+  if (n === 2) {
+    applySearch();
+    showStep(2);
+    return;
+  }
+  if (n === 3 && !window._currentId) return;
+  showStep(n);
+}
+function maybeAskOnce() {}
+function onDetailsPage() {
+  const step = document.getElementById('step3');
+  return step && !step.classList.contains('hidden');
+}
+function hasContact() {
+  try {
+    if (localStorage.getItem('dealwheel_asked_v2') !== '1') return false;
+  } catch (e) { return false; }
+  const p = loadProfile();
+  return !!(p && p.name && p.email);
+}
+function findCar(id) {
+  const lists = [window._deckList, typeof ranked !== 'undefined' ? ranked : [], typeof MOCK !== 'undefined' ? MOCK : []];
+  for (const list of lists) {
+    if (!Array.isArray(list)) continue;
+    const hit = list.find(x => String(x.id) === String(id));
+    if (hit) return hit;
+  }
+  return null;
+}
+function carFacts(car) {
+  const c = car || {};
+  return {
+    year: c.year || '',
+    make: c.make || '',
+    model: c.model || '',
+    trim: c.trim || '',
+    price: c.price || 0,
+    mileage: c.mileage || 0,
+    type: c.type || '',
+    location: c.location || '',
+    dealer: c.dealer || '',
+    vin: c.vin || '',
+    vdp: c.vdp || '',
+    insight: c.insight || ''
+  };
+}
+function askOnPage2(id, ev) {
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (onDetailsPage()) return;
+  const car = findCar(id);
+  window._currentId = id;
+  window._currentCar = car;
+  if (!car) {
+    alert('That car is no longer in this list. Search again, then check availability.');
+    return;
+  }
+  if (!document.getElementById('step2') || document.getElementById('step2').classList.contains('hidden')) return;
+  if (hasContact()) {
+    sendLead(loadProfile(), car);
+    showSavedToast(car);
+    return;
+  }
+  openInquiry();
+}
+function schedulePage1() {
+  if (!window._searched) return;
+  clearTimeout(window._p1timer);
+  window._p1timer = setTimeout(() => {
+    applySearch();
+    if (!document.getElementById('step2').classList.contains('hidden')) renderDeck();
+  }, 200);
+}
+
+if (document.getElementById('findBtn')) document.getElementById('findBtn').onclick = async () => {
+  const btn = document.getElementById('findBtn');
+  btn.disabled = true;
+  btn.textContent = 'Finding deals...';
+  applySearch();
+  document.getElementById('deck').innerHTML = skeletonCards(3);
+  showStep(2);
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  renderDeck();
+  btn.disabled = false;
+  btn.textContent = 'Find Better Deals';
+};
+if (document.getElementById('nextLot')) document.getElementById('nextLot').onclick = () => {
+  const list = window._deckList || ranked;
+  if (offset + 3 < list.length) { offset += 3; renderDeck(); }
+};
+if (document.getElementById('prevLot')) document.getElementById('prevLot').onclick = () => {
+  if (offset > 0) { offset = Math.max(0, offset - 3); renderDeck(); }
+};
+['budget','minYear','maxMiles','brand','considering','smartInput','zip','luxury','sport','reliability'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', schedulePage1);
+  el.addEventListener('change', schedulePage1);
+});
+document.querySelectorAll('.car-type').forEach(el => el.addEventListener('change', schedulePage1));
+
+if (document.getElementById('backTo1')) document.getElementById('backTo1').onclick = () => showStep(1);
+if (document.getElementById('backTo2')) document.getElementById('backTo2').onclick = () => showStep(2);
+
+const BRANDS = ['Acura','Alfa Romeo','Aston Martin','Audi','Bentley','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Ferrari','Fiat','Ford','Genesis','GMC','Honda','Hyundai','Ineos','Infiniti','Jaguar','Jeep','Kia','Lamborghini','Land Rover','Lexus','Lincoln','Lotus','Lucid','Maserati','Mazda','McLaren','Mercedes-Benz','Mini','Mitsubishi','Nissan','Polestar','Porsche','Ram','Rivian','Rolls-Royce','Subaru','Tesla','Toyota','VinFast','Volkswagen','Volvo'];
+function brandBox(cls) {
+  const all = '<label style="display:flex;align-items:center;gap:8px;padding:0.35rem 0.3rem;cursor:pointer"><input type="checkbox" class="' + cls + '" value="all" checked> All</label>';
+  return all + BRANDS.map(b => '<label style="display:flex;align-items:center;gap:8px;padding:0.35rem 0.3rem;cursor:pointer"><input type="checkbox" class="' + cls + '" value="' + b + '"> ' + b + '</label>').join('');
+}
+function brandChecks(cls) { return Array.from(document.querySelectorAll('.' + cls)); }
+function chosenBrands() {
+  const checked = brandChecks('brand-pick').filter(el => el.checked).map(el => el.value);
+  if (!checked.length || checked.includes('all')) return [];
+  return checked;
+}
+function paintBrandLabels() {
+  const names = chosenBrands();
+  const text = !names.length ? 'All' : (names.length === 1 ? names[0] : names.length + ' brands');
+  const a = document.getElementById('brandLabel');
+  const b = document.getElementById('tab2BrandLabel');
+  if (a) a.textContent = text;
+  if (b) b.textContent = text;
+}
+function copyBrandState(fromCls, toCls) {
+  const from = {};
+  brandChecks(fromCls).forEach(el => { from[el.value] = el.checked; });
+  brandChecks(toCls).forEach(el => { if (el.value in from) el.checked = from[el.value]; });
+}
+function onBrandChange(cls, other, cb) {
+  if (cb.value === 'all' && cb.checked) {
+    brandChecks(cls).forEach(o => { if (o.value !== 'all') o.checked = false; });
+  } else if (cb.value !== 'all' && cb.checked) {
+    const all = brandChecks(cls).find(o => o.value === 'all');
+    if (all) all.checked = false;
+  } else if (!brandChecks(cls).some(o => o.value !== 'all' && o.checked)) {
+    const all = brandChecks(cls).find(o => o.value === 'all');
+    if (all) all.checked = true;
+  }
+  copyBrandState(cls, other);
+  paintBrandLabels();
+}
+function bindBrandMenus() {
+  document.querySelectorAll('.brand-pick').forEach(cb => {
+    cb.onchange = () => {
+      onBrandChange('brand-pick', 'brand-pick-2', cb);
+      schedulePage1();
+      if (document.getElementById('step2') && !document.getElementById('step2').classList.contains('hidden')) filterTab2();
+    };
+  });
+  document.querySelectorAll('.brand-pick-2').forEach(cb => {
+    cb.onchange = () => {
+      onBrandChange('brand-pick-2', 'brand-pick', cb);
+      filterTab2();
+    };
+  });
+  paintBrandLabels();
+}
+(function initBrandMenus() {
+  const m1 = document.getElementById('brandMenu');
+  const m2 = document.getElementById('tab2BrandMenu');
+  if (m1) m1.innerHTML = brandBox('brand-pick');
+  if (m2) m2.innerHTML = brandBox('brand-pick-2');
+  bindBrandMenus();
+  const toggle = (btnId, menuId) => {
+    const btn = document.getElementById(btnId);
+    const menu = document.getElementById(menuId);
+    if (!btn || !menu) return;
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    };
+  };
+  toggle('brandToggle', 'brandMenu');
+  toggle('tab2BrandToggle', 'tab2BrandMenu');
+  document.addEventListener('click', (e) => {
+    ['brandDropdown','tab2BrandToggle','tab2BrandMenu','brandMenu'].forEach(() => {});
+    const b1 = document.getElementById('brandDropdown');
+    const b2 = document.getElementById('tab2BrandToggle');
+    const m2el = document.getElementById('tab2BrandMenu');
+    if (b1 && !b1.contains(e.target)) {
+      const menu = document.getElementById('brandMenu');
+      if (menu) menu.style.display = 'none';
+    }
+    if (m2el && b2 && !b2.contains(e.target) && !m2el.contains(e.target)) m2el.style.display = 'none';
+  });
+})();
+
+function updateCompareQuote() {
+  const body = document.getElementById('cmpBody');
+  if (!body || !window._cmpBase || !window._cmpRec) return;
+  const typed = +(document.getElementById('quotedPrice')?.value || 0);
+  window._quotedNewPrice = typed > 0 ? typed : 0;
+  const base = Object.assign({}, window._cmpBase);
+  const usingQuote = typed > 0;
+  if (usingQuote) base.price = typed;
+  const a = window._cmpRec;
+  const b = ownershipParts(base);
+  const money = n => '$' + Math.abs(Math.round(n)).toLocaleString();
+  const diffCell = n => (Math.abs(n) < 1 ? '$0' : ((n > 0 ? '+' : '−') + money(n)));
+  const rows = [
+    ['Loan payment', a.payment, b.payment],
+    ['Insurance', a.insurance, b.insurance],
+    ['Upkeep', a.maint, b.maint],
+    ['Fuel', a.fuel, b.fuel]
+  ];
+  body.innerHTML = rows.map(([label, left, right]) =>
+    `<tr><td>${label}</td><td>${money(left)}</td><td>${money(right)}</td><td>${diffCell(left - right)}</td></tr>`
+  ).join('') + `<tr class="total"><td>Year</td><td>${money(a.total)}</td><td>${money(b.total)}</td><td>${diffCell(a.total - b.total)}</td></tr>`;
+  const note = document.getElementById('cmpNote');
+  if (note) {
+    note.textContent = usingQuote
+      ? 'Using your quoted price of ' + money(typed) + '. The other figures are still estimates, not a dealer quote.'
+      : 'No quote entered, so this uses our estimate of ' + money(window._cmpBase.price) + '. All figures are estimates.';
+  }
+}
+
+function paymentFor(principal, apr, months) {
+  const r = (apr / 100) / 12;
+  if (!months || principal <= 0) return 0;
+  if (!r) return principal / months;
+  return principal * r / (1 - Math.pow(1 + r, -months));
+}
+function recalcOtd() {
+  const price = window._otdPrice || 0;
+  const taxEl = document.getElementById('otdTax');
+  if (!taxEl) return;
+  const taxPct = +taxEl.value || 0;
+  const fees = +document.getElementById('otdFees').value || 0;
+  const warrantyOn = document.getElementById('otdWarrantyOn').checked;
+  const warranty = warrantyOn ? (+document.getElementById('otdWarranty').value || 0) : 0;
+  const down = +document.getElementById('otdDown').value || 0;
+  const apr = +document.getElementById('otdApr').value || 0;
+  const term = +document.getElementById('otdTerm').value || 60;
+  const insurance = +document.getElementById('otdIns').value || 0;
+  const tax = Math.round(price * taxPct / 100);
+  const otd = Math.round(price + tax + fees + warranty);
+  const loan = paymentFor(Math.max(0, otd - down), apr, term);
+  document.getElementById('otdTaxAmt').textContent = '$' + tax.toLocaleString();
+  document.getElementById('otdTotal').textContent = '$' + otd.toLocaleString();
+  document.getElementById('otdLoan').textContent = '$' + Math.round(loan).toLocaleString();
+  document.getElementById('otdMonth').textContent = '$' + Math.round(loan + insurance).toLocaleString();
+  document.getElementById('otdAprLabel').textContent = apr.toFixed(1) + '%';
+  const wrap = document.getElementById('otdWarrantyWrap');
+  if (wrap) wrap.style.opacity = warrantyOn ? '1' : '0.45';
+}
+
+async function showDetail(id) { window._currentId = id;
+  const c = (window._deckList || ranked).find(x => x.id === id) || ranked.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('detail').innerHTML = '<div class="grid-3">' + skeletonCards(3) + '</div>';
+  showStep(3);
+  const liveResult = await fetchLiveForCar(c);
+  const live = liveResult && Array.isArray(liveResult.listings) ? liveResult.listings : [];
+  const farther = !!(liveResult && liveResult.outsideArea && live.length);
+  if (live.length) {
+    c.liveListings = live;
+    c.vdp = live.find(l => l.vdp)?.vdp || '';
+    c.image = live[0].image || c.image;
+    c.price = live[0].price || c.price;
+    c.mileage = live[0].mileage || c.mileage;
+    c.location = live[0].location || c.location;
+    c.dealer = live[0].dealer || c.dealer;
+  } else {
+    c.liveListings = [];
+    c.vdp = '';
+  }
+  const zip = document.getElementById('zip').value || '78701';
+  const compared = (window._considering || '').trim();
+  const named = compared && compared.toLowerCase() !== 'a new car';
+  const money = n => '$' + Math.abs(Math.round(n)).toLocaleString();
+  const diffCell = n => {
+    if (Math.abs(n) < 1) return '$0';
+    return (n > 0 ? '+' : '−') + money(n);
+  };
+  let compareTable = '';
+  if (named) {
+    const safeName = compared.replace(/[&<>"]/g, '');
+    window._cmpName = safeName;
+    compareTable = `
+      <div class="card" style="margin-top:1rem">
+        <h3 style="margin:0 0 0.2rem">Estimated yearly cost</h3>
+        <label class="label" for="quotedPrice">Quoted price of the new ${safeName}, if you know it</label>
+        <input class="input" id="quotedPrice" type="number" min="0" step="100" inputmode="numeric" placeholder="Optional, e.g. 32000" value="${window._quotedNewPrice || ''}" oninput="updateCompareQuote()" style="max-width:260px">
+        <p class="note" id="cmpNote" style="margin:0.45rem 0 0"></p>
+        <div style="overflow-x:auto">
+        <table class="cmp">
+          <thead>
+            <tr>
+              <th></th>
+              <th>${c.year} ${c.make} ${c.model}</th>
+              <th>New ${safeName}</th>
+              <th>Difference</th>
+            </tr>
+          </thead>
+          <tbody id="cmpBody"></tbody>
+        </table>
+        </div>
+      </div>`;
+  }
+  const stockNote = live.length
+    ? (farther
+      ? `<div class="insight" style="margin-bottom:0.8rem">No available listings in your area. Showing similar ${c.make} ${c.model} cars farther away.</div>`
+      : `<div class="insight" style="margin-bottom:0.8rem">${live.length} listing${live.length === 1 ? '' : 's'} near ${zip}.</div>`)
+    : `<div class="insight" style="margin-bottom:0.8rem">No available listings near ${zip}. This is the car detail only — we are not linking to a page we could not confirm.</div>`;
+  const listingCards = live.slice(0, 6).map(l => `
+    <div class="rec-card">
+      <img loading="lazy" decoding="async" src="${l.image || c.image}" alt="${c.year} ${c.make} ${c.model}" onerror="this.onerror=null;this.src=getFallback('${c.make}','${c.model}')">
+      <div class="c">
+        <h3>${c.year} ${c.make} ${c.model}</h3>
+        <div class="price">$${Number(l.price || 0).toLocaleString()}</div>
+        <div style="font-size:0.8rem;color:var(--muted)">${Number(l.mileage || 0).toLocaleString()} mi • ${l.location || ''}</div>
+        <div class="card-actions">
+          ${l.vdp ? `<button class="btn" onclick="gateDealer(${c.id}, decodeURIComponent('${encodeURIComponent(l.vdp)}'))">View at Dealer</button>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('detail').innerHTML = `
+    ${stockNote}
+    <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:1.2rem">
+      <div>
+        <img loading="eager" decoding="async" src="${verifyImage(c.make, c.model, c.image, c.year)}" onerror="this.onerror=null;this.src=getFallback('${c.make}','${c.model}')" data-make="${c.make}" data-model="${c.model}" data-year="${c.year}" style="width:100%;border-radius:8px;height:220px;object-fit:cover" alt="${c.year} ${c.make} ${c.model}">
+        <h2 style="margin:0.6rem 0 0.2rem">${c.year} ${c.make} ${c.model}</h2>
+        <div style="color:var(--muted)">${c.trim || ''}</div>
+        <div class="price" style="font-size:1.6rem;margin:0.5rem 0">$${Number(c.price || 0).toLocaleString()}</div>
+        <div style="font-size:0.85rem;color:var(--muted)">${Number(c.mileage || 0).toLocaleString()} miles • ${c.location || ''}</div>
+      </div>
+      <div>
+        <h3 style="margin-top:0">Out-the-door price</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin:0 0 0.7rem">Adjust the numbers. This stays on the page and is not sent anywhere.</p>
+        <div style="display:grid;gap:0.7rem">
+          <div>
+            <div style="display:flex;justify-content:space-between"><span class="label" style="margin:0">Interest rate</span><strong id="otdAprLabel">6.5%</strong></div>
+            <input type="range" id="otdApr" min="0" max="18" step="0.1" value="6.5" oninput="recalcOtd()">
+          </div>
+          <div class="grid-2">
+            <div>
+              <label class="label">Term</label>
+              <select class="input" id="otdTerm" onchange="recalcOtd()">
+                <option value="36">36 months</option>
+                <option value="48">48 months</option>
+                <option value="60" selected>60 months</option>
+                <option value="72">72 months</option>
+                <option value="84">84 months</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Down payment</label>
+              <input class="input" id="otdDown" type="number" min="0" step="500" value="${Math.round((c.price || 0) * 0.1)}" oninput="recalcOtd()">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label class="label">Sales tax %</label>
+              <input class="input" id="otdTax" type="number" min="0" max="15" step="0.1" value="6.5" oninput="recalcOtd()">
+            </div>
+            <div>
+              <label class="label">Doc and title fees</label>
+              <input class="input" id="otdFees" type="number" min="0" step="50" value="499" oninput="recalcOtd()">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label class="label">Est. insurance / month</label>
+              <input class="input" id="otdIns" type="number" min="0" step="10" value="160" oninput="recalcOtd()">
+            </div>
+            <div id="otdWarrantyWrap">
+              <label class="label" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="otdWarrantyOn" onchange="recalcOtd()"> Optional warranty</label>
+              <input class="input" id="otdWarranty" type="number" min="0" step="100" value="1495" oninput="recalcOtd()">
+            </div>
+          </div>
+          <div class="deal-metrics">
+            <div><b id="otdTaxAmt">$0</b><span>sales tax</span></div>
+            <div><b id="otdLoan">$0</b><span>loan / mo</span></div>
+            <div><b id="otdMonth">$0</b><span>with insurance</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:0.35rem;border-top:1px solid var(--border)">
+            <span style="color:var(--muted)">Out the door</span>
+            <strong id="otdTotal" style="font-size:1.55rem;color:#1370d0">$0</strong>
+          </div>
+          <div style="font-size:0.8rem;color:var(--muted)">Upkeep about $${estMaintenance(c).toLocaleString()} a year. Not included in the out-the-door price.</div>
+        </div>
+      </div>
+    </div>
+    ${compareTable}
+    ${live.length ? `<h3 style="margin:1.2rem 0 0.6rem">Available cars</h3><div class="grid-3">${listingCards}</div>` : ''}`;
+  window._otdPrice = Number(c.price || 0);
+  window._cmpRec = ownershipParts(c);
+  window._cmpBase = consideredCar();
+  recalcOtd();
+  if (named) updateCompareQuote();
+}
+
+function openAutoDev() {
+  const make = window._currentMake || '';
+  const model = window._currentModel || '';
+  const year = window._currentYear || '';
+  const zip = window._currentZip || '78701';
+  const url = `https://www.auto.dev/search?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${year}&zip=${zip}`;
+  document.getElementById('linkDisplay').innerHTML = '<a href="' + url + '" target="_blank" style="color:#1370d0">' + url + '</a>';
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) alert('Popup may be blocked. Click the link below or copy it.');
+}
+
+function openCarsCom() {
+  const make = window._currentMake || '';
+  const model = window._currentModel || '';
+  const year = window._currentYear || '';
+  const zip = window._currentZip || '78701';
+  const url = `https://www.cars.com/shopping/results/?stock_type=used&makes[]=${encodeURIComponent(make)}&models[]=${encodeURIComponent(model)}&zip=${zip}&maximum_distance=50&year_min=${year}&year_max=${year}`;
+  document.getElementById('linkDisplay').innerHTML = '<a href="' + url + '" target="_blank" style="color:#1370d0">' + url + '</a>';
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) alert('Popup may be blocked. Click the link below or copy it.');
+}
+
+let currentVehicle = null;
+
+
+
+function gateDealer(id, vdp) {
+  if (vdp) window.open(vdp, '_blank', 'noopener');
+}
+
+function quickInquiry(id) {
+  if (onDetailsPage()) return;
+  askOnPage2(id);
+}
+function loadProfile() {
+  try { return JSON.parse(localStorage.getItem('dealwheel_contact') || 'null'); } catch (e) { return null; }
+}
+function saveProfile(p) {
+  localStorage.setItem('dealwheel_contact', JSON.stringify(p));
+}
+function applyProfile(p) {
+  if (!p) return;
+  document.getElementById('inqName').value = p.name || '';
+  document.getElementById('inqEmail').value = p.email || '';
+  document.getElementById('inqPhone').value = p.phone || '';
+  document.getElementById('inqZip').value = p.zip || '';
+  if (p.timeline) document.getElementById('inqTimeline').value = p.timeline;
+  if (p.financing) document.getElementById('inqFinance').value = p.financing;
+  document.getElementById('inqConsent').checked = !!p.consent;
+}
+function profileFromForm() {
+  return {
+    name: document.getElementById('inqName').value.trim(),
+    email: document.getElementById('inqEmail').value.trim(),
+    phone: document.getElementById('inqPhone').value.trim(),
+    zip: document.getElementById('inqZip').value.trim(),
+    timeline: document.getElementById('inqTimeline').value,
+    financing: document.getElementById('inqFinance').value,
+    consent: document.getElementById('inqConsent').checked
+  };
+}
+function sendLead(profile, car) {
+  const vehicle = carFacts(car);
+  const title = [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(' ');
+  const saved = Array.isArray(shortlist) ? shortlist.map(carFacts) : [];
+  const details = [
+    'Vehicle: ' + (title || 'Unknown'),
+    'Price: $' + Number(vehicle.price || 0).toLocaleString(),
+    'Mileage: ' + Number(vehicle.mileage || 0).toLocaleString(),
+    'Type: ' + (vehicle.type || ''),
+    'Location: ' + (vehicle.location || ''),
+    vehicle.dealer ? 'Dealer: ' + vehicle.dealer : '',
+    vehicle.vin ? 'VIN: ' + vehicle.vin : '',
+    vehicle.vdp ? 'Listing: ' + vehicle.vdp : '',
+    'Budget: $' + Number(budget || 0).toLocaleString(),
+    'Was considering: ' + (window._considering || ''),
+    'Zip: ' + (profile.zip || '')
+  ].filter(Boolean).join('\n');
+  const lead = {
+    name: profile.name,
+    email: profile.email,
+    phone: profile.phone || '',
+    zip: profile.zip || (document.getElementById('zip') ? document.getElementById('zip').value : '') || '',
+    timeline: profile.timeline || '',
+    financing: profile.financing || '',
+    message: profile.message || (document.getElementById('inqMsg') ? document.getElementById('inqMsg').value.trim() : ''),
+    details: details,
+    considering: window._considering || '',
+    selectedVehicle: title,
+    selectedPrice: vehicle.price || 0,
+    vehicle: vehicle,
+    shortlist: saved,
+    consent: true,
+    submittedAt: new Date().toISOString()
+  };
+  fetch('/api/leads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(lead)
+  }).then(r => {
+    if (!r.ok) throw new Error('lead failed');
+  }).catch(() => {
+    showSavedToast(Object.assign({ year: '', make: 'Saved on this phone', model: '' }, car || {}));
+  });
+  if (window._pendingVdp) {
+    const url = window._pendingVdp;
+    window._pendingVdp = null;
+    window.open(url, '_blank', 'noopener');
+  }
+}
+function showSavedToast(car) {
+  let t = document.getElementById('appToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'appToast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#fff;color:#1a2332;border:1px solid #e2e8f0;padding:0.75rem 1rem;border-radius:10px;z-index:200;max-width:92%;font-size:0.85rem;box-shadow:0 8px 24px rgba(16,24,40,0.12)';
+    document.body.appendChild(t);
+  }
+  t.textContent = 'Availability request sent for ' + (car.year || '') + ' ' + (car.make || '') + ' ' + (car.model || '') + '.';
+  t.style.display = 'block';
+  clearTimeout(t._hide);
+  t._hide = setTimeout(() => { t.style.display = 'none'; }, 2400);
+}
+function openInquiry(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  if (onDetailsPage()) return;
+  const c = window._currentCar || findCar(window._currentId);
+  const saved = loadProfile();
+  if (hasContact()) {
+    if (c) {
+      sendLead(saved, c);
+      showSavedToast(c);
+    }
+    return;
+  }
+  applyProfile(saved);
+  if (!document.getElementById('inqZip').value && document.getElementById('zip')) {
+    document.getElementById('inqZip').value = document.getElementById('zip').value || '';
+  }
+  document.getElementById('modalVehicle').textContent = c
+    ? ('Checking ' + c.year + ' ' + c.make + ' ' + c.model + (c.trim ? ' ' + c.trim : '') + ' · $' + Number(c.price || 0).toLocaleString() + ' · ' + Number(c.mileage || 0).toLocaleString() + ' mi')
+    : 'Tell us how to reach you for this car.';
+  const modal = document.getElementById('inquiryModal');
+  modal.style.display = 'flex';
+  document.getElementById('inquirySuccess').style.display = 'none';
+  const name = document.getElementById('inqName');
+  if (name && !name.value) name.focus();
+}
+
+if (document.getElementById('closeModal')) document.getElementById('closeModal').onclick = () => {
+  document.getElementById('inquiryModal').style.display = 'none';
+};
+
+if (document.getElementById('inquiryModal')) document.getElementById('inquiryModal').onclick = (e) => {
+  if (e.target.id === 'inquiryModal') {
+    document.getElementById('inquiryModal').style.display = 'none';
+  }
+};
+// Prevent clicks inside the modal box from closing it
+document.querySelector('#inquiryModal > div').onclick = (e) => e.stopPropagation();
+
+if (document.getElementById('submitInquiry')) document.getElementById('submitInquiry').onclick = () => {
+  const profile = profileFromForm();
+  if (!profile.name || !profile.email) {
+    alert('Please enter name and email');
+    return;
+  }
+  if (!profile.consent) {
+    alert('Please agree before we share your info with a dealer.');
+    return;
+  }
+  saveProfile(profile);
+  try { localStorage.setItem('dealwheel_asked_v2', '1'); } catch (e) {}
+  const c = window._currentCar || findCar(window._currentId);
+  if (!c) {
+    alert('That car is no longer in this list. Search again, then check availability.');
+    return;
+  }
+  sendLead(Object.assign({}, profile, { message: document.getElementById('inqMsg') ? document.getElementById('inqMsg').value.trim() : '' }), c);
+  const nextId = window._currentId;
+
+  const btn = document.getElementById('submitInquiry');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  document.getElementById('inquirySuccess').textContent = 'Saved. We will only ask this once.';
+  document.getElementById('inquirySuccess').style.display = 'block';
+  setTimeout(() => {
+    btn.textContent = 'Send Inquiry';
+    btn.disabled = false;
+    document.getElementById('inquiryModal').style.display = 'none';
+  }, 500);
+};
+
+if (document.getElementById('stickyInquiry')) {
+  document.getElementById('stickyInquiry').onclick = (e) => {
+    if (e) e.preventDefault();
+  };
+}
+try { localStorage.removeItem('dealwheel_leads'); } catch (e) {}
+
+document.getElementById('shortlistToggle').onclick = () => {
+  const p = document.getElementById('shortlistPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  renderShortlist();
+};
+renderShortlist();
+
+</script>
+</body>
+</html>
