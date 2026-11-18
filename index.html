@@ -280,6 +280,23 @@
           <option value="999999" selected>Any</option>
         </select>
       </div>
+      <div style="width:120px">
+        <label class="label" style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Min year</label>
+        <select id="tab2Year" class="input" style="padding:0.55rem;height:42px" onchange="filterTab2()">
+          <option value="2012">2012+</option>
+          <option value="2014">2014+</option>
+          <option value="2016">2016+</option>
+          <option value="2018" selected>2018+</option>
+          <option value="2019">2019+</option>
+          <option value="2020">2020+</option>
+          <option value="2021">2021+</option>
+          <option value="2022">2022+</option>
+          <option value="2023">2023+</option>
+          <option value="2024">2024+</option>
+          <option value="2025">2025+</option>
+          <option value="2026">2026</option>
+        </select>
+      </div>
       <div style="width:170px;position:relative">
         <label class="label" style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Brand</label>
         <div class="dropdown-toggle input" id="tab2BrandToggle" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;height:42px">
@@ -855,6 +872,10 @@ function filterTab2() {
   const t = (document.getElementById('tab2Type').value || 'all').toLowerCase();
   const similar = document.getElementById('tab2Similar')?.checked;
   const milesCap = +(document.getElementById('tab2Miles')?.value || 999999) || 999999;
+  const yearPick = document.getElementById('tab2Year');
+  const pageYear = document.getElementById('minYear');
+  const minYear = +(yearPick?.value || pageYear?.value || 2018) || 2018;
+  if (pageYear) pageYear.value = String(minYear);
   const pageMiles = document.getElementById('maxMiles');
   if (pageMiles && document.getElementById('tab2Miles')) pageMiles.value = String(milesCap);
   const display = document.getElementById('tab2BudgetDisplay');
@@ -863,7 +884,7 @@ function filterTab2() {
   _filterTimer = setTimeout(() => {
     budget = b;
     const prefs = {
-      minYear: document.getElementById('minYear')?.value || 2018,
+      minYear: minYear,
       maxYear: 2026,
       brand: chosenBrands(),
       carTypes: t === 'all' ? ['all'] : [t],
@@ -1167,6 +1188,18 @@ function applySearch() {
   const milesEl = document.getElementById('maxMiles');
   const miles2 = document.getElementById('tab2Miles');
   if (milesEl && miles2) miles2.value = milesEl.value;
+  const year1 = document.getElementById('minYear');
+  const year2 = document.getElementById('tab2Year');
+  if (year1 && year2) {
+    const want = String(year1.value || '2018');
+    if (![...year2.options].some(o => o.value === want)) {
+      const opt = document.createElement('option');
+      opt.value = want;
+      opt.textContent = want + '+';
+      year2.appendChild(opt);
+    }
+    year2.value = want;
+  }
   const typeEl = document.getElementById('tab2Type');
   if (typeEl) typeEl.value = types.length === 1 ? types[0] : 'all';
   window._searched = true;
