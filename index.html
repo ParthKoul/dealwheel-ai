@@ -17,15 +17,11 @@
   .hero-slide.active { opacity:1; z-index:2; }
   .hero-show img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
   .hero-slide.explain img { object-fit:contain; background:#f7f9fc; }
-  .hero-nav { position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.9); background:rgba(255,255,255,.88); color:#1a2332; cursor:pointer; font:inherit; font-size:1.1rem; z-index:3; transition:background .2s ease; }
-  .hero-nav:hover { background:#fff; }
-  .hero-prev { left:10px; }
-  .hero-next { right:10px; }
   .hero-dots { position:absolute; left:0; right:0; bottom:10px; display:flex; justify-content:center; gap:6px; z-index:3; }
   .hero-dot { width:8px; height:8px; border-radius:50%; border:0; background:rgba(26,35,50,.28); padding:0; cursor:pointer; transition:transform .3s ease, background .3s ease; }
   .hero-dot.on { background:#1370d0; transform:scale(1.35); }
   @media (prefers-reduced-motion: reduce) {
-    .hero-slide, .hero-dot, .hero-nav { transition:none; }
+    .hero-slide, .hero-dot { transition:none; }
   }
   .logo { font-size:1.45rem; font-weight:800; color:#1370d0; letter-spacing:-0.03em; background:none; border:0; padding:0; cursor:pointer; font-family:inherit; }
   .steps { font-size:0.82rem; color:var(--muted); }
@@ -168,8 +164,6 @@
       <div class="hero-slide explain">
         <img src="/hero-explain.jpg" alt="Same budget, stronger car. A pre-owned upgrade, with payment and maintenance shown, and live listings near you.">
       </div>
-      <button class="hero-nav hero-prev" type="button" aria-label="Previous slide">‹</button>
-      <button class="hero-nav hero-next" type="button" aria-label="Next slide">›</button>
       <div class="hero-dots">
         <button class="hero-dot on" type="button" aria-label="Car photo"></button>
         <button class="hero-dot" type="button" aria-label="How DealWheel works"></button>
@@ -1954,10 +1948,6 @@ renderShortlist();
     timer = setInterval(() => show(i + 1), 6000);
   }
   dots.forEach((d, idx) => { d.onclick = () => { show(idx); start(); }; });
-  const prev = root.querySelector('.hero-prev');
-  const next = root.querySelector('.hero-next');
-  if (prev) prev.onclick = () => { show(i - 1); start(); };
-  if (next) next.onclick = () => { show(i + 1); start(); };
   root.addEventListener('mouseenter', () => clearInterval(timer));
   root.addEventListener('mouseleave', start);
   start();
