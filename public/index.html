@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>DealWheel AI — Full Preview</title>
-  <meta name="dealwheel-build" content="2026-11-18-github-hero">
+  <meta name="dealwheel-build" content="2026-11-18-unlock-listings">
 <style>
   :root { --bg:#f5f7fa; --surface:#ffffff; --surface-2:#f0f3f7; --border:#e2e8f0; --text:#1a2332; --muted:#5c6b7a; --accent:#1370d0; --success:#0f8a4b; --radius:12px; }
   * { box-sizing:border-box; }
@@ -58,6 +58,10 @@
     box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
   }
   .btn-secondary:hover { background: #f3f7fc; border-color: #1370d0; color: #1370d0; }
+  .listings-locked { filter: blur(10px); pointer-events: none; user-select: none; max-height: 320px; overflow: hidden; }
+  .listings-lock { position: absolute; left: 0; right: 0; top: 2.4rem; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.55rem; text-align: center; padding: 1rem; background: linear-gradient(180deg, rgba(245,247,250,0.2), rgba(245,247,250,0.9) 42%); border-radius: 14px; }
+  .unlock-btn { font-size: 1.08rem; padding: 1rem 1.6rem; min-width: min(100%, 300px); box-shadow: 0 8px 22px rgba(19, 112, 208, 0.28); }
+  .listings-lock p { margin: 0; color: var(--muted); font-size: 0.88rem; max-width: 340px; }
   #backTo1, #backTo2, #prevLot, #nextLot {
     border-radius: 999px;
     padding: 0.55rem 1rem;
@@ -1443,8 +1447,22 @@ async function showDetail(id) { window._currentId = id;
         </div>
       </div>
     </div>`).join('');
+  const locked = live.length > 0 && !hasContact();
+  const listingsBlock = live.length
+    ? `<div id="listingsGate" style="position:relative;margin-top:1.4rem">
+        <h3 style="margin:0 0 0.6rem">Available cars</h3>
+        <div id="listingsBody" class="${locked ? 'listings-locked' : ''}">
+          ${stockNote}
+          <div class="grid-3">${listingCards}</div>
+        </div>
+        ${locked ? `<div id="listingsLock" class="listings-lock">
+          <button class="btn unlock-btn" type="button" onclick="unlockListings()">Unlock real listings</button>
+          <p>See the dealer photos, prices, and miles. We only ask once.</p>
+        </div>` : ''}
+      </div>`
+    : stockNote;
+  window._currentCar = c;
   document.getElementById('detail').innerHTML = `
-    ${stockNote}
     <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:1.2rem">
       <div>
         <img loading="eager" decoding="async" src="${verifyImage(c.make, c.model, c.image, c.year)}" onerror="this.onerror=null;this.src=getFallback('${c.make}','${c.model}')" data-make="${c.make}" data-model="${c.model}" data-year="${c.year}" style="width:100%;border-radius:8px;height:220px;object-fit:cover" alt="${c.year} ${c.make} ${c.model}">
@@ -1511,7 +1529,7 @@ async function showDetail(id) { window._currentId = id;
       </div>
     </div>
     ${compareTable}
-    ${live.length ? `<h3 style="margin:1.2rem 0 0.6rem">Available cars</h3><div class="grid-3">${listingCards}</div>` : ''}`;
+    ${listingsBlock}`;
   window._otdPrice = Number(c.price || 0);
   window._cmpRec = ownershipParts(c);
   window._cmpBase = consideredCar();
@@ -1545,6 +1563,24 @@ let currentVehicle = null;
 
 
 
+function unlockListings() {
+  const c = window._currentCar || findCar(window._currentId);
+  if (!c) return;
+  window._currentCar = c;
+  if (hasContact()) {
+    revealListings();
+    return;
+  }
+  window._formForListings = true;
+  openInquiry();
+}
+function revealListings() {
+  const body = document.getElementById('listingsBody');
+  const lock = document.getElementById('listingsLock');
+  if (body) body.classList.remove('listings-locked');
+  if (lock) lock.remove();
+  window._formForListings = false;
+}
 function gateDealer(id, vdp) {
   if (vdp) window.open(vdp, '_blank', 'noopener');
 }
@@ -1644,7 +1680,7 @@ function showSavedToast(car) {
 }
 function openInquiry(e) {
   if (e && e.stopPropagation) e.stopPropagation();
-  if (onDetailsPage()) return;
+  if (onDetailsPage() && !window._formForListings) return;
   const c = window._currentCar || findCar(window._currentId);
   const saved = loadProfile();
   if (hasContact()) {
@@ -1658,9 +1694,11 @@ function openInquiry(e) {
   if (!document.getElementById('inqZip').value && document.getElementById('zip')) {
     document.getElementById('inqZip').value = document.getElementById('zip').value || '';
   }
-  document.getElementById('modalVehicle').textContent = c
+  document.getElementById('modalVehicle').textContent = window._formForListings
+    ? ('Unlock listings for the ' + c.year + ' ' + c.make + ' ' + c.model)
+    : (c
     ? ('Checking ' + c.year + ' ' + c.make + ' ' + c.model + (c.trim ? ' ' + c.trim : '') + ' · $' + Number(c.price || 0).toLocaleString() + ' · ' + Number(c.mileage || 0).toLocaleString() + ' mi')
-    : 'Tell us how to reach you for this car.';
+    : 'Tell us how to reach you for this car.');
   const modal = document.getElementById('inquiryModal');
   modal.style.display = 'flex';
   document.getElementById('inquirySuccess').style.display = 'none';
@@ -1705,10 +1743,12 @@ if (document.getElementById('submitInquiry')) document.getElementById('submitInq
   btn.textContent = 'Sending...';
   document.getElementById('inquirySuccess').textContent = 'Saved. We will only ask this once.';
   document.getElementById('inquirySuccess').style.display = 'block';
+  const openedListings = !!window._formForListings;
   setTimeout(() => {
     btn.textContent = 'Send Inquiry';
     btn.disabled = false;
     document.getElementById('inquiryModal').style.display = 'none';
+    if (openedListings) revealListings();
   }, 500);
 };
 
