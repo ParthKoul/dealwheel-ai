@@ -255,7 +255,7 @@
         </div>
         <div class="form-group">
           <label class="label">Min year</label>
-          <input class="input" id="minYear" type="number" value="2018">
+          <input class="input" id="minYear" type="number" min="2020" max="2026" value="2020">
         </div>
         <div class="form-group">
           <label class="label">Max mileage</label>
@@ -312,12 +312,7 @@
       <div style="width:120px">
         <label class="label" style="font-size:0.75rem;display:block;margin-bottom:0.25rem">Min year</label>
         <select id="tab2Year" class="input" style="padding:0.55rem;height:42px" onchange="filterTab2()">
-          <option value="2012">2012+</option>
-          <option value="2014">2014+</option>
-          <option value="2016">2016+</option>
-          <option value="2018" selected>2018+</option>
-          <option value="2019">2019+</option>
-          <option value="2020">2020+</option>
+          <option value="2020" selected>2020+</option>
           <option value="2021">2021+</option>
           <option value="2022">2022+</option>
           <option value="2023">2023+</option>
@@ -670,7 +665,7 @@ function matchLabels(c) {
 }
 
 function rank(budget, prefs) {
-  const minYear = +prefs.minYear || 2010;
+  const minYear = Math.max(2020, +prefs.minYear || 2020);
   const maxYear = +prefs.maxYear || 2026;
   const brands = Array.isArray(prefs.brand) ? prefs.brand.map(b => String(b).toLowerCase()).filter(b => b && b !== 'all') : ((prefs.brand || '').toLowerCase().trim() ? [(prefs.brand || '').toLowerCase().trim()] : []);
   const allBrands = brands.length === 0;
@@ -903,7 +898,7 @@ function filterTab2() {
   const milesCap = +(document.getElementById('tab2Miles')?.value || 999999) || 999999;
   const yearPick = document.getElementById('tab2Year');
   const pageYear = document.getElementById('minYear');
-  const minYear = +(yearPick?.value || pageYear?.value || 2018) || 2018;
+  const minYear = Math.min(2026, Math.max(2020, +(yearPick?.value || pageYear?.value || 2020) || 2020));
   if (pageYear) pageYear.value = String(minYear);
   const pageMiles = document.getElementById('maxMiles');
   if (pageMiles && document.getElementById('tab2Miles')) pageMiles.value = String(milesCap);
@@ -1134,7 +1129,7 @@ async function fetchLiveListings(budget, prefs, distance = 50) {
     zip,
     distance: String(distance),
     'retailListing.price': `0-${Math.round(budget * 1.15)}`,
-    'vehicle.year': `${prefs.minYear || 2018}-${prefs.maxYear || 2026}`,
+    'vehicle.year': `${Math.max(2020, prefs.minYear || 2020)}-${prefs.maxYear || 2026}`,
     'retailListing.miles': '0-40000'
   });
   const liveBrands = Array.isArray(prefs.brand) ? prefs.brand.filter(b => b && b !== 'all') : (prefs.brand ? [prefs.brand] : []);
@@ -1220,7 +1215,8 @@ function applySearch() {
   const year1 = document.getElementById('minYear');
   const year2 = document.getElementById('tab2Year');
   if (year1 && year2) {
-    const want = String(year1.value || '2018');
+    const want = String(Math.min(2026, Math.max(2020, parseInt(year1.value, 10) || 2020)));
+    year1.value = want;
     if (![...year2.options].some(o => o.value === want)) {
       const opt = document.createElement('option');
       opt.value = want;
