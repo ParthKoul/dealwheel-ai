@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>DealWheel AI — Full Preview</title>
-  <meta name="dealwheel-build" content="2026-11-18-unlock-listings">
+  <meta name="dealwheel-build" content="2026-11-18-compare-blog">
 <style>
   :root { --bg:#f5f7fa; --surface:#ffffff; --surface-2:#f0f3f7; --border:#e2e8f0; --text:#1a2332; --muted:#5c6b7a; --accent:#1370d0; --success:#0f8a4b; --radius:12px; }
   * { box-sizing:border-box; }
@@ -27,7 +27,12 @@
   .sticky-cta { display:none; }
   .privacy { font-size:0.75rem; color:var(--muted); line-height:1.4; margin:0.4rem 0 0.8rem; }
   input[type=range] { width:100%; height:7px; accent-color:var(--accent); }
-  .budget-value { font-size:1.5rem; font-weight:700; color:#1370d0; }
+  .cmp-row { display:flex; justify-content:space-between; gap:0.6rem; font-size:0.82rem; padding:0.32rem 0; border-top:1px solid var(--border); }
+  .cmp-row span { color:var(--muted); }
+  .compare-blog { margin-top:1.4rem; }
+  .compare-blog h2 { margin:0 0 0.3rem; letter-spacing:-0.03em; }
+  .cmp-card h3 { margin:0 0 0.35rem; font-size:1.05rem; letter-spacing:-0.02em; }
+  .cmp-card p { margin:0 0 0.75rem; color:var(--muted); font-size:0.88rem; line-height:1.45; }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -139,7 +144,7 @@
     <img src="/hero.jpg" alt="A better used SUV instead of a new ordinary car" style="width:100%;max-height:340px;object-fit:cover;object-position:center;border-radius:16px;margin-bottom:1rem;display:block;background:#e8eef5">
     <div class="card" style="margin-bottom:1rem">
       <h2 style="margin:0 0 0.4rem;font-size:1.7rem;letter-spacing:-0.03em">A better car for the same money</h2>
-      <p style="color:var(--muted);margin:0 0 1rem;line-height:1.5">DealWheel compares the new car you were about to buy with stronger pre-owned options in the same budget. Often that is a newer luxury or sport model that has already taken the big depreciation hit.</p>
+      <p style="color:var(--muted);margin:0 0 1rem;line-height:1.5">DealWheel compares the car you were about to buy with stronger pre-owned options in the same budget. On the details page you can put your choice next to the recommendation and see the price and yearly cost side by side. Often the better car is a luxury or sport model that has already taken the big depreciation hit.</p>
       <div class="grid-3">
         <div>
           <div style="font-weight:700;color:#1370d0;margin-bottom:0.2rem">1. Tell us the car</div>
@@ -147,7 +152,7 @@
         </div>
         <div>
           <div style="font-weight:700;color:#1370d0;margin-bottom:0.2rem">2. See three better fits</div>
-          <div style="color:var(--muted);font-size:0.88rem;line-height:1.4">We rank pre-owned cars near your price, with payment and ownership cost.</div>
+          <div style="color:var(--muted);font-size:0.88rem;line-height:1.4">We rank pre-owned cars near your price, then compare payment and yearly cost with the car you typed in.</div>
         </div>
         <div>
           <div style="font-weight:700;color:#1370d0;margin-bottom:0.2rem">3. Check a real listing</div>
@@ -240,6 +245,94 @@
 
       <button class="btn" id="findBtn" style="width:100%">Find Better Deals</button>
     </div>
+
+    <section class="compare-blog" id="compareBlog">
+      <h2>Car comparisons</h2>
+      <p style="color:var(--muted);margin:0 0 1rem;line-height:1.5">Ten high-level matchups, in the style of a buying guide. Each one is a new everyday car versus a stronger used car near the same money. Prices are estimates, not quotes.</p>
+      <div class="grid-3">
+        <article class="card cmp-card">
+          <h3>Camry vs Accord vs 3 Series</h3>
+          <p>A new Camry or Accord is the sensible sedan. A two- or three-year-old BMW 3 Series often sits in that same window and is the car you actually want to drive.</p>
+          <div class="cmp-row"><span>New Camry</span><b>about $32k</b></div>
+          <div class="cmp-row"><span>New Accord</span><b>about $31k</b></div>
+          <div class="cmp-row"><span>Used 3 Series</span><b>about $32–38k</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Toyota Camry', 35000)">Compare a Camry</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>CR-V vs X3</h3>
+          <p>The CR-V is the default compact SUV. A used X3 is the upgrade: a quieter cabin and a tighter drive, if you can live with pricier service.</p>
+          <div class="cmp-row"><span>New CR-V</span><b>about $35k</b></div>
+          <div class="cmp-row"><span>Used BMW X3</span><b>about $34–42k</b></div>
+          <div class="cmp-row"><span>Pick the CR-V if</span><b>you want simple upkeep</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Honda CR-V', 38000)">Compare a CR-V</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>RAV4 vs Lexus RX</h3>
+          <p>Same idea, finished differently. A used RX is the quieter, more comfortable version of the RAV4 you were about to buy new.</p>
+          <div class="cmp-row"><span>New RAV4</span><b>about $34k</b></div>
+          <div class="cmp-row"><span>Used Lexus RX</span><b>about $36–44k</b></div>
+          <div class="cmp-row"><span>Pick the RX if</span><b>the ride matters more</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Toyota RAV4', 40000)">Compare a RAV4</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>RAV4 vs Porsche Macan</h3>
+          <p>This is the stretch. A used Macan is not a RAV4 with a badge. It is quicker and more planted, and it costs more to own. Worth it only if the budget can reach the mid-40s.</p>
+          <div class="cmp-row"><span>New RAV4</span><b>about $34k</b></div>
+          <div class="cmp-row"><span>Used Macan</span><b>about $42–52k</b></div>
+          <div class="cmp-row"><span>Watch</span><b>fuel and service</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Toyota RAV4', 48000)">Compare a RAV4</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>Accord vs Audi A4</h3>
+          <p>The Accord has more back seat. The used A4 is the luxury step that still fits an Accord budget once the first owner has paid the depreciation.</p>
+          <div class="cmp-row"><span>New Accord</span><b>about $31k</b></div>
+          <div class="cmp-row"><span>Used Audi A4</span><b>about $28–36k</b></div>
+          <div class="cmp-row"><span>Pick the Accord if</span><b>you want space</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Honda Accord', 34000)">Compare an Accord</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>Highlander vs BMW X5</h3>
+          <p>Buy the new Highlander for three rows and easy ownership. A few-year-old X5 is the better drive if two rows are enough.</p>
+          <div class="cmp-row"><span>New Highlander</span><b>about $45k</b></div>
+          <div class="cmp-row"><span>Used BMW X5</span><b>about $42–55k</b></div>
+          <div class="cmp-row"><span>Pick the Highlander if</span><b>you need 3 rows</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Toyota Highlander', 50000)">Compare a Highlander</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>Tucson vs Genesis GV70</h3>
+          <p>The Tucson is the practical compact. A used GV70 is what to look at when that cabin feels ordinary and the budget is still near $40k.</p>
+          <div class="cmp-row"><span>New Tucson</span><b>about $32k</b></div>
+          <div class="cmp-row"><span>Used GV70</span><b>about $34–42k</b></div>
+          <div class="cmp-row"><span>Pick the GV70 if</span><b>the interior matters</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Hyundai Tucson', 40000)">Compare a Tucson</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>Pilot vs Mercedes GLE</h3>
+          <p>The Pilot is the family hauler. The used GLE is the nicer two-row SUV in a similar price band, not a seven-seat replacement.</p>
+          <div class="cmp-row"><span>New Pilot</span><b>about $43k</b></div>
+          <div class="cmp-row"><span>Used GLE</span><b>about $40–52k</b></div>
+          <div class="cmp-row"><span>Pick the Pilot if</span><b>you need 3 rows</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Honda Pilot', 48000)">Compare a Pilot</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>Tacoma vs Lexus GX</h3>
+          <p>A new Tacoma holds its price. A used GX is the more comfortable, more capable truck-based SUV, and it uses more fuel.</p>
+          <div class="cmp-row"><span>New Tacoma</span><b>about $40k</b></div>
+          <div class="cmp-row"><span>Used Lexus GX</span><b>about $42–55k</b></div>
+          <div class="cmp-row"><span>Watch</span><b>fuel on the GX</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Toyota Tacoma', 48000)">Compare a Tacoma</button>
+        </article>
+        <article class="card cmp-card">
+          <h3>Ioniq 5 vs Model Y vs Lucid</h3>
+          <p>A used Model Y is usually the value. A new Ioniq 5 is the fresh-warranty choice. A used Lucid Air is the upgrade only if the budget is already near $60k.</p>
+          <div class="cmp-row"><span>New Ioniq 5</span><b>about $44k</b></div>
+          <div class="cmp-row"><span>Used Model Y</span><b>about $30–40k</b></div>
+          <div class="cmp-row"><span>Used Lucid Air</span><b>about $50–70k</b></div>
+          <button class="btn btn-secondary" style="margin-top:0.8rem;width:100%" type="button" onclick="useCompare('Hyundai Ioniq 5', 45000)">Compare an Ioniq 5</button>
+        </article>
+      </div>
+      <p style="color:var(--muted);font-size:0.8rem;margin:0.9rem 0 0">Estimates only, to set a budget. Your details page uses the car you type in, and you can replace the new-car price with a real quote.</p>
+    </section>
   </div>
 
   <!-- STEP 2 -->
@@ -1131,6 +1224,18 @@ function applySearch() {
   const typeEl = document.getElementById('tab2Type');
   if (typeEl) typeEl.value = types.length === 1 ? types[0] : 'all';
   window._searched = true;
+}
+function useCompare(name, budget) {
+  const c = document.getElementById('considering');
+  const b = document.getElementById('budget');
+  if (c) c.value = name;
+  if (b) {
+    b.value = String(budget);
+    const d = document.getElementById('budgetDisplay');
+    if (d) d.textContent = '$' + Number(budget).toLocaleString();
+  }
+  goStep(1);
+  if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 function goStep(n) {
   if (n === 2) {
